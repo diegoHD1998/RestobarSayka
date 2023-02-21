@@ -1,0 +1,115 @@
+.login-body {
+    background: #FFFFFF;
+  }
+  .login-body .login-wrapper {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 100vh;
+  }
+  .login-body .login-wrapper .login-panel {
+    width: 30%;
+    height: 100%;
+    text-align: center;
+    padding: 40px 20px;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    flex: 1 1 100%;
+  }
+  .login-body .login-wrapper .login-panel .logo {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .login-body .login-wrapper .login-panel .logo img {
+    width: 150px;
+    height: 80px;
+  }
+  .login-body .login-wrapper .login-panel > a, .login-body .login-wrapper .login-panel > button.forget-password {
+    margin-bottom: 0px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 10px;
+    line-height: 12px;
+    color: rgba(41, 50, 65, 0.3);
+  }
+  .login-body .login-wrapper .login-panel > p {
+    font-weight: 500;
+    margin: 0;
+    color: rgba(41, 50, 65, 0.5);
+    margin-top: 40px;
+  }
+  .login-body .login-wrapper .login-panel > p > a, .login-body .login-wrapper .login-panel > p button {
+    color: #2170E7;
+    cursor: pointer;
+  }
+  .login-body .login-wrapper .login-panel .userName .cajaSpan > input {
+    width: 247px;
+    max-width: 247px;
+    /* margin-bottom: 10px; */
+    background-color: #F6F7F7;
+    /* border: 1.2px solid #D4D6D9; */
+    color: #515C66;
+    padding: 12px 10px;
+  }
+  .login-body .login-wrapper .login-panel > input::placeholder {
+    color: gba(41, 50, 65, 0.3);
+  }
+  .login-body .login-wrapper .login-panel .p-password {
+    width: 247px;
+  }
+
+  
+
+  .login-body .login-wrapper .login-panel .p-password .p-password-input {
+    width: 100%;
+    /* margin-bottom: 10px; */
+    background-color: #F6F7F7;
+    /* border: 1.2px solid #D4D6D9; */
+    color: #515C66;
+    padding: 12px 10px;
+  }
+
+  .login-body .login-wrapper .login-panel .p-password .p-password-input::placeholder {
+    color: gba(41, 50, 65, 0.3);
+  }
+  .login-body .login-wrapper .login-panel .botonLogin {
+    width: 247px;
+    max-width: 247px;
+    margin-bottom: 10px;
+    padding: 0;
+  }
+  .login-body .login-wrapper .login-panel > button > span {
+    padding: 15px 20px;
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 16px;
+  }
+  .login-body .login-wrapper .login-footer {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    padding-bottom: 70px;
+  }
+  .login-body .login-wrapper .login-footer h4 {
+    line-height: 22px;
+    margin: 0;
+    margin-right: 32px;
+  }
+  .login-body .login-wrapper .login-footer h6 {
+    line-height: 17px;
+    margin: 0;
+    color: rgba(41, 50, 65, 0.5);
+    font-weight: 500;
+  }
