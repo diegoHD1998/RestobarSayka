@@ -63,7 +63,8 @@ const PedidosMesa = () => {
         hora:null,
         productoIdProducto: null,
         pedidoIdPedido: null,
-        comentario:''
+        comentario:'',
+        recepcion: false
     }
 
     let emptyProducto = {
@@ -76,6 +77,25 @@ const PedidosMesa = () => {
         categoriaIdCategoria:null,
         varianteIdVariante:null
     }
+
+    let listaDescuentos = [
+        {
+            name:'10%',
+            porcent:0.1
+        },
+        {
+            name:'15%',
+            porcent:0.15
+        },
+        {
+            name:'20%',
+            porcent:0.2
+        },
+        {
+            name:'25%',
+            porcent:0.25
+        }
+    ]
     
     
 
@@ -91,6 +111,7 @@ const PedidosMesa = () => {
     const [categorias, setCategorias] = useState([])
     const [productoPedidos, setProductoPedidos] = useState([]) // ProductoPedidos de la mesa actual
     const [categoriaSelected, setCategoriaSelected] = useState(null)
+    const [porcentajeSelected, setPorcentajeSelected] = useState(null)
 
     const [opcionVariantes, setOpcionVariantes] = useState(null)
     const [opcionesVariantesProducto, setOpcionesVariantesProducto] = useState(null)
@@ -104,6 +125,7 @@ const PedidosMesa = () => {
     
     const [selected, setSelected] = useState(null);
     const toast = useRef(null);
+    const toastTL = useRef(null);
     const dt = useRef(null)
     
     const [dialogVisible, setDialogVisible] = useState(false);
@@ -117,9 +139,11 @@ const PedidosMesa = () => {
     const [SubTotal, setSubTotal] = useState(0)//---------------------------------
     const [Total, setTotal] = useState(0)//---------------------------------
     const [Propina, setPropina] = useState(0)//---------------------------------
-    const [PropinaTemp, setPropinaTemp] = useState(0)
     const [efectivoR, setEfectivoR] = useState(0)//---------------------------------
     const [Vuelto, setVuelto] = useState(0)
+    const [Descuento, setDescuento] = useState(0)
+
+    const [ProductoPedidosRecepcion, setProductoPedidosRecepcion] = useState(null)
 
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
@@ -167,6 +191,18 @@ const PedidosMesa = () => {
                         if(rest){
                             if(rest.status >= 200 && rest.status < 300){
                                 setProductoPedidos(rest.data)// Trae los Productos de ese pedido de la mesa
+                                
+                                let cont = 0
+                                rest.data.forEach((value) => {
+                                    if(value.recepcion === false){
+                                        cont = cont +1
+                                    }
+                                })
+
+                                if(cont !== 0){
+                                    setProductoPedidosRecepcion(false)
+                                }
+
 
                             }else{
                                 console.log('Error al cargar Datos de ProductoPedido')
@@ -345,6 +381,7 @@ const PedidosMesa = () => {
         setTotal(0)
         setTextoPropina('')
         setSwit(false)
+        setPorcentajeSelected(null)
     }
 
     const hideDialogEfectivo = async() => {
@@ -362,6 +399,7 @@ const PedidosMesa = () => {
         setTotal(0)
         setTextoPropina('')
         setSwit(false)
+        setPorcentajeSelected(null)
         history.push("/")
     }
 
@@ -379,6 +417,7 @@ const PedidosMesa = () => {
         setTotal(0)
         setTextoPropina('')
         setSwit(false)
+        setPorcentajeSelected(null)
         history.push("/")
     }
 
@@ -627,6 +666,22 @@ const PedidosMesa = () => {
 
     }
 
+
+    const ImprimirProdutoPedidos = () => {
+
+    }
+
+    const productoPedidosRecepcionados = () => {
+        let _productoPedidos = [...productoPedidos];
+        showTopLeft();
+        
+    }
+
+
+    const showTopLeft = () => {
+        toastTL.current.show({severity: 'info', summary: 'Envio a Impresora', detail: 'Los pedidos han sido enviados a imprimir', life: 3000});
+    }
+
     const confirmDeleteProduct = (product) => {/* <----------------- */
         setProductoPedido(product);
         setDeleteProductDialog(true);
@@ -669,6 +724,13 @@ const PedidosMesa = () => {
         dt.current.filter(e.value, 'categoriaIdCategoria', 'equals');
         setCategoriaSelected(e.value);
     }
+
+    const onPorcentajeChange = (e) => {
+        setPorcentajeSelected(e.value)
+        console.log(e.value)
+    }
+
+    const descuentoTempalte = <span style={{color:'red'}}><b> %</b></span>
 
     const onInputNumberChange = (e, name) => {
         const val = e.value || 0;
@@ -719,10 +781,12 @@ const PedidosMesa = () => {
     }
 
     const HoraBodyTemplate = (rowData) => {
-        let _hora = rowData.hora.hours
-        let _minuto = rowData.hora.minutes
-        let _tiempo = `${_hora}:${_minuto}`
-        return <span className={`product-badge-1 status-activo`}>{_tiempo}</span>
+        let _hora = rowData.hora
+
+        let _tiempo = _hora.split(".")
+        //let _minuto = rowData.hora
+    
+        return <span className={`product-badge-1 status-activo`}>{_tiempo[0]}</span>
     }
 
     const PrecioBodyTemplate = (rowData) => {
@@ -739,6 +803,10 @@ const PedidosMesa = () => {
 
     const categoriaItemTemplate = (option) => {
         return <span>{option.nombre}</span>
+    }
+
+    const descuentoItemTemplate = (option) => {
+        return <span>{option.name}</span>
     }
 
     const TotalPagoBodyTemplate = () => {
@@ -827,7 +895,12 @@ const PedidosMesa = () => {
 
             <div>
                 <Button label='Pre-Cuenta' disabled={pedido === null ? true : false}  className='p-button-info p-mr-2' />
-                <Button label='Cobrar' disabled={pedido === null ? true : false}  className='p-button-success' onClick={()=> PreCobrar() } />
+
+
+                <Button label='Pedido' className={ProductoPedidosRecepcion === true ? `p-button-secondary p-mr-2` : `p-button-danger p-mr-2`} onClick={()=> productoPedidosRecepcionados()}/>
+
+
+                <Button label='Pagar' disabled={pedido === null ? true : false}  className='p-button-success' onClick={()=> PreCobrar() } />
             </div>
             
         </div>
@@ -912,8 +985,18 @@ const PedidosMesa = () => {
         </div>
         
     )
+
+    const Transferencia = (
+        <div>
+            <i className="pi pi-credit-card" style={{'fontSize': '1.2em'}}></i>
+            <span style={{'fontSize': '1.2em'}}> Transferencia</span>
+        </div>
+        
+    )
     const dialogFooterEfectivo = <div className="p-d-flex p-jc-center"><Button label="Finalizar Venta" className="p-button-text" autoFocus onClick={() => hideDialogEfectivo()} /></div>;
     const dialogFooterTarjeta = <div className="p-d-flex p-jc-center"><Button label="Finalizar Venta" className="p-button-text" autoFocus onClick={() => hideDialogTarjeta()} /></div>;
+
+    
 
     let headerGroup = <ColumnGroup>                    
                         <Row>
@@ -940,6 +1023,7 @@ const PedidosMesa = () => {
 
         <div className='p-grid p-d-flex' >
                 <Toast ref={toast} />
+                <Toast ref={toastTL} position="top-left"/>
             <div className='p-col-12 p-lg-6 '>
                 <DataTable dataKey="pedidoIdPedido" value={productoPedidos} header={header4} scrollable scrollHeight='410px' headerColumnGroup={headerGroup} footerColumnGroup={footerGroup} /* scrollable scrollHeight='400px' */>
                     <Column field="productoIdProducto" body={productoBodyTemplate} />
@@ -1081,39 +1165,47 @@ const PedidosMesa = () => {
 
                     <Divider/>
 
-                    <div className='p-d-flex p-ai-center p-jc-between' >
+                    
+                        <div className='p-d-flex p-jc-between'>
 
-                        <div className='p-d-flex'>
                             <div className='p-d-flex p-ai-center'>
                                 <h5 style={{margin:'0px'}}>
                                     <b>Propina:</b>
                                 </h5>
+                                <div>
+                                    <InputNumber id='propina' size={9} className=' p-ml-2' value={Propina} onChange={(e)=> CambioDePropinaManual(e)} mode="currency" currency="CLP" locale="es-CL"/>
+                                </div>
                             </div>
 
-                            <div>
-                                <InputNumber id='propina' className=' p-ml-2' value={Propina} onChange={(e)=> CambioDePropinaManual(e)} mode="currency" currency="CLP" locale="es-CL"/>
+                            <div className='p-ml-2 p-mt-1'>
+                                <InputSwitch checked={swit} onChange={(e)=>onInputSwitchChange(e)}/>
                             </div>
                         </div>
-
-                        <div>
-                            <InputSwitch checked={swit} onChange={(e)=>onInputSwitchChange(e)}/>
-                        </div>
-                    </div>
+                    
 
                     <Divider/>
 
+                        <div className='p-d-flex p-ai-center'>
+                            <h5 className='p-mr-1' style={{margin:'0px', color:'red'}}>
+                                <b>Descuentos:</b>
+                            </h5>
+                            <Dropdown value={porcentajeSelected} options={listaDescuentos} optionLabel='name' optionValue='porcent' placeholder={descuentoTempalte} virtualScrollerOptions={{ itemSize: 3 }} itemTemplate={descuentoItemTemplate} onChange={(e)=>onPorcentajeChange(e)} className='p-column-filter' showClear/>
+                            <InputNumber className='p-ml-1' value={Descuento} size={9} mode="currency" currency="CLP" locale="es-CL" />
+                        </div>
+
+                    <Divider/>
                     <div className='p-d-flex p-flex-column'>
 
                         <div className="p-field">
                             <label className='p-mr-2' htmlFor="efectivo">Efectivo recibido</label>
-                            <InputNumber id="efectivo" value={efectivoR} onChange={(e)=> setEfectivoR(e.value)} mode="currency" currency="CLP" locale="es-CL" />
+                            <InputNumber id="efectivo" value={efectivoR} size={9} onChange={(e)=> setEfectivoR(e.value)} mode="currency" currency="CLP" locale="es-CL" />
                             
                         </div>
 
-                        <div className='p-d-flex'>
-                            <Button label={Efectivo} className='p-button-info p-button-outlined p-col-4 p-mr-1' onClick={()=>saveVenta(1)} />
-                            <Button label={Tarjeta}  className='p-button-info p-button-outlined p-col-4' onClick={()=>saveVenta(2)} />
-
+                        <div className=' p-jc-center'>
+                            <Button label={Efectivo} className='p-button-success p-col-12 p-mb-2' onClick={()=>saveVenta(1)} />
+                            <Button label={Tarjeta}  className='p-button-danger p-col-12 p-mb-2' onClick={()=>saveVenta(2)} />
+                            <Button label={Transferencia} className='p-button-primary p-col-12 p-mb-2'/> 
                         </div>
 
                         
