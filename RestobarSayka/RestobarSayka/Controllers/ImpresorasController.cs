@@ -80,39 +80,53 @@ namespace RestobarSayka.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult> PostImpresora(int id)
-        { 
-            var impresorasCategorias = await _context.Categoria.ToListAsync();
-            foreach (var itemCate in impresorasCategorias)
+        {
+            try
             {
-                var productosPedido = (from m in _context.Mesas
-                                      join pd in _context.Pedidos on m.IdMesa equals pd.MesaIdMesa
-                                      join pp in _context.ProductoPedidos on pd.IdPedido equals pp.PedidoIdPedido
-                                      join pr in _context.Productos on pp.ProductoIdProducto equals pr.IdProducto
-                                      join c in _context.Categoria on pr.CategoriaIdCategoria equals c.IdCategoria
-                                      join u in _context.Usuarios on pd.UsuarioIdUsuario equals u.IdUsuario
-                                      where c.IdCategoria == itemCate.IdCategoria 
-                                      && pp.Recepcion == false 
-                                      && pd.IdPedido == id
-                                      select new TicketPedido
-                                      {
-                                          IdPedido = pd.IdPedido,
-                                          Producto = pr.Nombre,
-                                          NombreReferencia = pp.NombreReferencia,
-                                          Comentario = pp.Comentario,
-                                          Cantidad =pp.Cantidad,
-                                          Mesa = m.Nombre,
-                                          Usuario = u.Nombre
-                                      }).ToList();
-                if (productosPedido.Count > 0)
-                    ImprimirTicketPedidoAsync(productosPedido, itemCate.IpImpresora);
+                var ipCategorias = _context.Categoria.Select(i => i.IpImpresora).Distinct().ToList();
+                foreach (var itemIp in ipCategorias)
+                {
+                    var productosPedido = (from m in _context.Mesas
+                                           join pd in _context.Pedidos on m.IdMesa equals pd.MesaIdMesa
+                                           join pp in _context.ProductoPedidos on pd.IdPedido equals pp.PedidoIdPedido
+                                           join pr in _context.Productos on pp.ProductoIdProducto equals pr.IdProducto
+                                           join c in _context.Categoria on pr.CategoriaIdCategoria equals c.IdCategoria
+                                           join u in _context.Usuarios on pd.UsuarioIdUsuario equals u.IdUsuario
+                                           where c.IpImpresora == itemIp
+                                           && pp.Recepcion == false
+                                           && pd.IdPedido == id
+                                           select new TicketPedido
+                                           {
+                                               IdPedido = pd.IdPedido,
+                                               Producto = pr.Nombre,
+                                               NombreReferencia = pp.NombreReferencia,
+                                               Comentario = pp.Comentario,
+                                               Cantidad = pp.Cantidad,
+                                               Mesa = m.Nombre,
+                                               Usuario = u.Nombre,
+                                               IdProductoPedido = pp.IdProductoPedido
+                                           }).ToList();
+                    if (productosPedido.Count > 0)
+                    {
+                        ImprimirTicketPedidoAsync(productosPedido, itemIp);
+                        foreach (var item in productosPedido)
+                        {
+                            var productoPedido = await _context.ProductoPedidos.FindAsync(item.IdProductoPedido);
 
+                            productoPedido.Recepcion = true;
+                            _context.Entry(productoPedido).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+
+
+                }
+                return Ok();
             }
-            //_context.Impresoras.Add(impresora);
-            //await _context.SaveChangesAsync();
-
-            return Ok();
-
-            
+            catch (Exception ex)
+            {
+                return BadRequest("Problema para imprimir revise las impresoras");
+            }
         }
 
         private async void ImprimirTicketPedidoAsync(List<TicketPedido> productosPedido, string ipImpresora)
@@ -126,22 +140,31 @@ namespace RestobarSayka.Controllers
             var encabezado = ByteSplicer.Combine(
                 e.SetStyles(PrintStyle.DoubleWidth),
                 e.PrintLine("------------------------"),
+<<<<<<< Updated upstream
                 
+=======
+
+>>>>>>> Stashed changes
                 e.LeftAlign(),
                 e.PrintLine("N Interno: " + productosPedido[0].IdPedido),
                 e.PrintLine(DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss")),
                 e.PrintLine("Mesa: " + productosPedido[0].Mesa),
-                e.PrintLine(productosPedido[0].Usuario)                
+                e.PrintLine(productosPedido[0].Usuario)
                 );
             foreach (var detallePedido in productosPedido)
             {
                 detalle = ByteSplicer.Combine(detalle,
                      e.LeftAlign(),
                      e.SetStyles(PrintStyle.Bold | PrintStyle.DoubleWidth),
+<<<<<<< Updated upstream
                      e.PrintLine(detallePedido.Cantidad.ToString() + " X " +  detallePedido.Producto + " " + detallePedido.NombreReferencia ),
+=======
+                     e.PrintLine(detallePedido.Cantidad.ToString() + " X " + detallePedido.Producto + " " + detallePedido.NombreReferencia),
+>>>>>>> Stashed changes
                      e.SetStyles(PrintStyle.None));
                 if (!string.IsNullOrEmpty(detallePedido.Comentario))
-                { detalle = ByteSplicer.Combine(detalle,
+                {
+                    detalle = ByteSplicer.Combine(detalle,
                                          e.LeftAlign(),
                                          e.PrintLine("*** " + detallePedido.Comentario)
                                         );
@@ -153,10 +176,12 @@ namespace RestobarSayka.Controllers
                     );
             }
             await printer.WriteAsync( // or, if using and immediate printer, use await printer.WriteAsync
-              ByteSplicer.Combine(     
+              ByteSplicer.Combine(
                 encabezado,
                 detalle,
                 
+                e.PrintLine(""),
+                e.PrintLine(""),
                 e.PrintLine(""),
                 e.PrintLine(""),
                 e.PrintLine(""),
@@ -167,7 +192,6 @@ namespace RestobarSayka.Controllers
 
 
         }
-
         // DELETE: api/Impresoras/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteImpresora(int id)
