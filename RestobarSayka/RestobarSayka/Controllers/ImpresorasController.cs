@@ -79,63 +79,86 @@ namespace RestobarSayka.Controllers
         // POST: api/Impresoras
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async void PostImpresora()
-        {
+        public async Task<ActionResult> PostImpresora(int id)
+        { 
+            var impresorasCategorias = await _context.Categoria.ToListAsync();
+            foreach (var itemCate in impresorasCategorias)
+            {
+                var productosPedido = (from m in _context.Mesas
+                                      join pd in _context.Pedidos on m.IdMesa equals pd.MesaIdMesa
+                                      join pp in _context.ProductoPedidos on pd.IdPedido equals pp.PedidoIdPedido
+                                      join pr in _context.Productos on pp.ProductoIdProducto equals pr.IdProducto
+                                      join c in _context.Categoria on pr.CategoriaIdCategoria equals c.IdCategoria
+                                      join u in _context.Usuarios on pd.UsuarioIdUsuario equals u.IdUsuario
+                                      where c.IdCategoria == itemCate.IdCategoria 
+                                      && pp.Recepcion == false 
+                                      && pd.IdPedido == id
+                                      select new TicketPedido
+                                      {
+                                          IdPedido = pd.IdPedido,
+                                          Producto = pr.Nombre,
+                                          NombreReferencia = pp.NombreReferencia,
+                                          Comentario = pp.Comentario,
+                                          Cantidad =pp.Cantidad,
+                                          Mesa = m.Nombre,
+                                          Usuario = u.Nombre
+                                      }).ToList();
+                if (productosPedido.Count > 0)
+                    ImprimirTicketPedidoAsync(productosPedido, itemCate.IpImpresora);
+
+            }
             //_context.Impresoras.Add(impresora);
             //await _context.SaveChangesAsync();
 
-            //return CreatedAtAction("GetImpresora", new { id = impresora.IdImpresora }, impresora);
+            return Ok();
 
+            
+        }
+
+        private async void ImprimirTicketPedidoAsync(List<TicketPedido> productosPedido, string ipImpresora)
+        {
             // Ethernet or WiFi (This uses an Immediate Printer, no live paper status events, but is easier to use)
-            var hostnameOrIp = "192.168.1.14";
+            var hostnameOrIp = ipImpresora;
             var port = 9100;
             var printer = new ImmediateNetworkPrinter(new ImmediateNetworkPrinterSettings() { ConnectionString = $"{hostnameOrIp}:{port}" });
             var e = new EPSON();
+            byte[] detalle = e.PrintLine("---------------------------------------------------");
+            var encabezado = ByteSplicer.Combine(
+                e.PrintLine("---------------------------------------------------"),
+                e.LeftAlign(),
+                e.PrintLine("N Interno: " + productosPedido[0].IdPedido),
+                e.PrintLine(DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss")),
+                e.PrintLine("Mesa: " + productosPedido[0].Mesa),
+                e.PrintLine(productosPedido[0].Usuario)                
+                );
+            foreach (var detallePedido in productosPedido)
+            {
+                detalle = ByteSplicer.Combine(detalle,
+                     e.LeftAlign(),
+                     e.PrintLine(detallePedido.Cantidad.ToString() + "  X  " +  detallePedido.Producto + " " + detallePedido.NombreReferencia ),
+                    );
+                if (!string.IsNullOrEmpty(detallePedido.Comentario))
+                { detalle = ByteSplicer.Combine(detalle,
+                                         e.LeftAlign(),
+                                         e.PrintLine(detallePedido.Comentario.Substring(0,48))
+                                        );
+                }
+                detalle = ByteSplicer.Combine(detalle,
+                     e.LeftAlign(),
+                     e.PrintLine("---------------------------------------------------")
+                    );
+            }
             await printer.WriteAsync( // or, if using and immediate printer, use await printer.WriteAsync
-              ByteSplicer.Combine(
-                e.CenterAlign(),
-                //e.PrintImage(File.ReadAllBytes("images/pd-logo-300.png"), true),
-                e.PrintLine(""),
-                e.SetBarcodeHeightInDots(360),
-                e.SetBarWidth(BarWidth.Default),
-                e.SetBarLabelPosition(BarLabelPrintPosition.None),
-                e.PrintBarcode(BarcodeType.ITF, "0123456789"),
-                e.PrintLine(""),
-                e.PrintLine("B&H PHOTO & VIDEO"),
-                e.PrintLine("420 NINTH AVE."),
-                e.PrintLine("NEW YORK, NY 10001"),
-                e.PrintLine("(212) 502-6380 - (800)947-9975"),
-                e.SetStyles(PrintStyle.Underline),
-                e.PrintLine("www.bhphotovideo.com"),
-                e.SetStyles(PrintStyle.None),
-                e.PrintLine(""),
-                e.LeftAlign(),
-                e.PrintLine("Order: 123456789        Date: 02/01/19"),
-                e.PrintLine(""),
-                e.PrintLine(""),
-                e.SetStyles(PrintStyle.FontB),
-                e.PrintLine("1   TRITON LOW-NOISE IN-LINE MICROPHONE PREAMP"),
-                e.PrintLine("    TRFETHEAD/FETHEAD                        89.95         89.95"),
-                e.PrintLine("----------------------------------------------------------------"),
-                e.RightAlign(),
-                e.PrintLine("SUBTOTAL         89.95"),
-                e.PrintLine("Total Order:         89.95"),
-                e.PrintLine("Total Payment:         89.95"),
-                e.PrintLine(""),
-                e.LeftAlign(),
-                e.SetStyles(PrintStyle.Bold | PrintStyle.FontB),
-                e.PrintLine("SOLD TO:                        SHIP TO:"),
-                e.SetStyles(PrintStyle.FontB),
-                e.PrintLine("  FIRSTN LASTNAME                 FIRSTN LASTNAME"),
-                e.PrintLine("  123 FAKE ST.                    123 FAKE ST."),
-                e.PrintLine("  DECATUR, IL 12345               DECATUR, IL 12345"),
-                e.PrintLine("  (123)456-7890                   (123)456-7890"),
-                e.PrintLine("  CUST: 87654321"),
+              ByteSplicer.Combine(     
+                encabezado,
+                detalle,
                 e.PrintLine(""),
                 e.PrintLine(""),
                 e.FullCut()
               )
             );
+
+
         }
 
         // DELETE: api/Impresoras/5

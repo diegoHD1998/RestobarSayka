@@ -19,7 +19,7 @@ namespace RestobarSayka.Models
         public string Estado { get; set; }
         public string Tipo { get; set; }
         public int? ImpresoraIdImpresora { get; set; }
-
+        public string IpImpresora { get; set; }
         public virtual Impresora ImpresoraIdImpresoraNavigation { get; set; }
         public virtual ICollection<Producto> Productos { get; set; }
     }
