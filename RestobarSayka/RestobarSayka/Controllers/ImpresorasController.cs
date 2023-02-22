@@ -122,9 +122,11 @@ namespace RestobarSayka.Controllers
             var port = 9100;
             var printer = new ImmediateNetworkPrinter(new ImmediateNetworkPrinterSettings() { ConnectionString = $"{hostnameOrIp}:{port}" });
             var e = new EPSON();
-            byte[] detalle = e.PrintLine("---------------------------------------------------");
+            byte[] detalle = e.PrintLine("------------------------");
             var encabezado = ByteSplicer.Combine(
-                e.PrintLine("---------------------------------------------------"),
+                e.SetStyles(PrintStyle.DoubleWidth),
+                e.PrintLine("------------------------"),
+                
                 e.LeftAlign(),
                 e.PrintLine("N Interno: " + productosPedido[0].IdPedido),
                 e.PrintLine(DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss")),
@@ -135,23 +137,28 @@ namespace RestobarSayka.Controllers
             {
                 detalle = ByteSplicer.Combine(detalle,
                      e.LeftAlign(),
-                     e.PrintLine(detallePedido.Cantidad.ToString() + "  X  " +  detallePedido.Producto + " " + detallePedido.NombreReferencia ),
-                    );
+                     e.SetStyles(PrintStyle.Bold | PrintStyle.DoubleWidth),
+                     e.PrintLine(detallePedido.Cantidad.ToString() + " X " +  detallePedido.Producto + " " + detallePedido.NombreReferencia ),
+                     e.SetStyles(PrintStyle.None));
                 if (!string.IsNullOrEmpty(detallePedido.Comentario))
                 { detalle = ByteSplicer.Combine(detalle,
                                          e.LeftAlign(),
-                                         e.PrintLine(detallePedido.Comentario.Substring(0,48))
+                                         e.PrintLine("*** " + detallePedido.Comentario)
                                         );
                 }
                 detalle = ByteSplicer.Combine(detalle,
                      e.LeftAlign(),
-                     e.PrintLine("---------------------------------------------------")
+                     e.SetStyles(PrintStyle.DoubleWidth),
+                     e.PrintLine("------------------------")
                     );
             }
             await printer.WriteAsync( // or, if using and immediate printer, use await printer.WriteAsync
               ByteSplicer.Combine(     
                 encabezado,
                 detalle,
+                
+                e.PrintLine(""),
+                e.PrintLine(""),
                 e.PrintLine(""),
                 e.PrintLine(""),
                 e.FullCut()
