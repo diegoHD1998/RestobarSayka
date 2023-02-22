@@ -87,6 +87,8 @@ namespace RestobarSayka.Data
 
                 entity.Property(e => e.ImpresoraIdImpresora).HasColumnName("ImpresoraId_impresora");
 
+                entity.Property(e => e.IpImpresora).HasColumnName("Ip_impresora");
+
                 entity.Property(e => e.Nombre).IsRequired();
 
                 entity.Property(e => e.Tipo).IsRequired();

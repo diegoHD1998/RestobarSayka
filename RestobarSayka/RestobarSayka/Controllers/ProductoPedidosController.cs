@@ -57,8 +57,15 @@ namespace RestobarSayka.Controllers
         [HttpGet("Bar")]
         public async Task<ActionResult<IEnumerable<SP_ProductoPedido>>> GetSPBar()
         {
-            var result = await _context.SP_Productopedido.FromSqlInterpolated($"Exec SP_ProductoPedidoBar").ToListAsync();
-            return Ok(result);
+            try
+            {
+                var result = await _context.SP_Productopedido.FromSqlInterpolated($"Exec SP_ProductoPedidoBar").ToListAsync();
+                return Ok(result);
+            }
+             catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
