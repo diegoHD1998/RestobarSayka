@@ -23,6 +23,7 @@ import ProductoPedidoService from '../../service/PedidoService/ProductoPedidoSer
 import PedidoService from '../../service/PedidoService/PedidoService';
 import MesaService from '../../service/MesasService/MesaService';
 import VentaService from '../../service/VentaService/VentaService';
+import ImpresoraService from '../../service/Impresora/ImpresoraService';
 
 
 const PedidosMesa = () => {
@@ -111,7 +112,7 @@ const PedidosMesa = () => {
     const [categorias, setCategorias] = useState([])
     const [productoPedidos, setProductoPedidos] = useState([]) // ProductoPedidos de la mesa actual
     const [categoriaSelected, setCategoriaSelected] = useState(null)
-    const [porcentajeSelected, setPorcentajeSelected] = useState(null)
+    const [porcentajeSelected, setPorcentajeSelected] = useState(undefined)
 
     const [opcionVariantes, setOpcionVariantes] = useState(null)
     const [opcionesVariantesProducto, setOpcionesVariantesProducto] = useState(null)
@@ -142,6 +143,7 @@ const PedidosMesa = () => {
     const [efectivoR, setEfectivoR] = useState(0)//---------------------------------
     const [Vuelto, setVuelto] = useState(0)
     const [Descuento, setDescuento] = useState(0)
+    const [GuardadoManualDescuento, setGuardadoManualDescuento] = useState(false)
 
     const [ProductoPedidosRecepcion, setProductoPedidosRecepcion] = useState(null)
 
@@ -152,6 +154,7 @@ const PedidosMesa = () => {
     const pedidoService = new PedidoService()
     const mesaService = new MesaService()
     const ventaService = new VentaService()
+    const impresoraService = new ImpresoraService()
 
     useEffect(() => {
 
@@ -381,7 +384,8 @@ const PedidosMesa = () => {
         setTotal(0)
         setTextoPropina('')
         setSwit(false)
-        setPorcentajeSelected(null)
+        setPorcentajeSelected(undefined)
+        setDescuento(0)
     }
 
     const hideDialogEfectivo = async() => {
@@ -399,7 +403,8 @@ const PedidosMesa = () => {
         setTotal(0)
         setTextoPropina('')
         setSwit(false)
-        setPorcentajeSelected(null)
+        setPorcentajeSelected(undefined)
+        setDescuento(0)
         history.push("/")
     }
 
@@ -417,7 +422,8 @@ const PedidosMesa = () => {
         setTotal(0)
         setTextoPropina('')
         setSwit(false)
-        setPorcentajeSelected(null)
+        setPorcentajeSelected(undefined)
+        setDescuento(0)
         history.push("/")
     }
 
@@ -666,21 +672,34 @@ const PedidosMesa = () => {
 
     }
 
-
-    const ImprimirProdutoPedidos = () => {
-
-    }
-
-    const productoPedidosRecepcionados = () => {
-        let _productoPedidos = [...productoPedidos];
-        showTopLeft();
-        
-    }
+     const productoPedidosRecepcionados = () => {
+         
+     }
 
 
     const showTopLeft = () => {
         toastTL.current.show({severity: 'info', summary: 'Envio a Impresora', detail: 'Los pedidos han sido enviados a imprimir', life: 3000});
     }
+
+    const ImprimirProdutoPedidos = async() => {
+
+        await impresoraService.imprimirPedidosMesa(pedido.idPedido)
+        .then(res => {
+
+            if(res.status >= 200 && res.status < 300){
+
+                showTopLeft()
+
+            }else if(res.status >= 400 && res.status < 500){
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+            }else{
+                console.log(res)
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Impresora, Status No controlado`, life: 5000 });
+            }
+        })
+
+    }
+
 
     const confirmDeleteProduct = (product) => {/* <----------------- */
         setProductoPedido(product);
@@ -727,8 +746,51 @@ const PedidosMesa = () => {
 
     const onPorcentajeChange = (e) => {
         setPorcentajeSelected(e.value)
-        console.log(e.value)
+
+        if(e.value === undefined){
+            setEfectivoR(Total + Descuento)
+            setTotal(Total + Descuento);
+            setDescuento(0)
+            setGuardadoManualDescuento(false)
+        }else{
+            let _descuento = Total * e.value;
+            setDescuento(_descuento);
+            setEfectivoR(Total - _descuento)
+            setTotal(Total - _descuento);
+            setGuardadoManualDescuento(true)
+        }
     }
+
+    const descuentoManual = (e) => {
+
+        if(porcentajeSelected === undefined){
+            setDescuento(e.value)
+        }
+    }
+
+    const BotonDescuentoManual = () => {
+
+        if(porcentajeSelected !== undefined){
+            console.log('no hacer nada');
+        }else if(porcentajeSelected === undefined && Descuento !== 0){
+            console.log('Se aplico el descuento')
+            setTotal(Total - Descuento);
+            setEfectivoR(Total - Descuento)
+            setGuardadoManualDescuento(true)
+        }
+    }
+
+    const LimpiarDescuento = () => {
+
+        let _descuento = Descuento
+
+        setEfectivoR(Total + _descuento)
+        setTotal(Total + _descuento);
+        setDescuento(0)
+        setGuardadoManualDescuento(false)
+    }
+
+
 
     const descuentoTempalte = <span style={{color:'red'}}><b> %</b></span>
 
@@ -897,7 +959,7 @@ const PedidosMesa = () => {
                 <Button label='Pre-Cuenta' disabled={pedido === null ? true : false}  className='p-button-info p-mr-2' />
 
 
-                <Button label='Pedido' className={ProductoPedidosRecepcion === true ? `p-button-secondary p-mr-2` : `p-button-danger p-mr-2`} onClick={()=> productoPedidosRecepcionados()}/>
+                <Button label='Pedido' disabled={pedido === null ? true : false} className={ProductoPedidosRecepcion === true ? `p-button-secondary p-mr-2` : `p-button-danger p-mr-2`} onClick={()=> ImprimirProdutoPedidos()}/>
 
 
                 <Button label='Pagar' disabled={pedido === null ? true : false}  className='p-button-success' onClick={()=> PreCobrar() } />
@@ -1190,7 +1252,9 @@ const PedidosMesa = () => {
                                 <b>Descuentos:</b>
                             </h5>
                             <Dropdown value={porcentajeSelected} options={listaDescuentos} optionLabel='name' optionValue='porcent' placeholder={descuentoTempalte} virtualScrollerOptions={{ itemSize: 3 }} itemTemplate={descuentoItemTemplate} onChange={(e)=>onPorcentajeChange(e)} className='p-column-filter' showClear/>
-                            <InputNumber className='p-ml-1' value={Descuento} size={9} mode="currency" currency="CLP" locale="es-CL" />
+                            <InputNumber className='p-ml-1' value={Descuento} size={9} mode="currency" currency="CLP" locale="es-CL"  onChange={(e)=>descuentoManual(e)} disabled={GuardadoManualDescuento}/>
+                            <Button icon="pi pi-save" className="p-button-rounded p-button-primary p-ml-1" onClick={()=> BotonDescuentoManual()} disabled={GuardadoManualDescuento} />
+                            <Button icon="pi pi-replay" className="p-button-rounded p-button-primary p-ml-1" disabled={porcentajeSelected !== undefined ? true : false} onClick={()=> LimpiarDescuento()} />
                         </div>
 
                     <Divider/>

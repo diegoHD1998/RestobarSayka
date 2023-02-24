@@ -7970,11 +7970,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\diego\\Desktop\\Restobar2\\RestobarSayka\\RestobarSayka\\RestobarSayka.csproj",
+      "projectUniqueName": "C:\\Users\\diego\\Desktop\\RestobarSayka\\RestobarSayka\\RestobarSayka\\RestobarSayka.csproj",
       "projectName": "RestobarSayka",
-      "projectPath": "C:\\Users\\diego\\Desktop\\Restobar2\\RestobarSayka\\RestobarSayka\\RestobarSayka.csproj",
+      "projectPath": "C:\\Users\\diego\\Desktop\\RestobarSayka\\RestobarSayka\\RestobarSayka\\RestobarSayka.csproj",
       "packagesPath": "C:\\Users\\diego\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\diego\\Desktop\\Restobar2\\RestobarSayka\\RestobarSayka\\obj\\",
+      "outputPath": "C:\\Users\\diego\\Desktop\\RestobarSayka\\RestobarSayka\\RestobarSayka\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\diego\\AppData\\Roaming\\NuGet\\NuGet.Config",

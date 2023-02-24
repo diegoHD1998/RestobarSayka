@@ -78,7 +78,7 @@ namespace RestobarSayka.Controllers
 
         // POST: api/Impresoras
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost("{id}")]
         public async Task<ActionResult> PostImpresora(int id)
         {
             try
@@ -140,11 +140,6 @@ namespace RestobarSayka.Controllers
             var encabezado = ByteSplicer.Combine(
                 e.SetStyles(PrintStyle.DoubleWidth),
                 e.PrintLine("------------------------"),
-<<<<<<< Updated upstream
-                
-=======
-
->>>>>>> Stashed changes
                 e.LeftAlign(),
                 e.PrintLine("N Interno: " + productosPedido[0].IdPedido),
                 e.PrintLine(DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss")),
@@ -156,11 +151,7 @@ namespace RestobarSayka.Controllers
                 detalle = ByteSplicer.Combine(detalle,
                      e.LeftAlign(),
                      e.SetStyles(PrintStyle.Bold | PrintStyle.DoubleWidth),
-<<<<<<< Updated upstream
                      e.PrintLine(detallePedido.Cantidad.ToString() + " X " +  detallePedido.Producto + " " + detallePedido.NombreReferencia ),
-=======
-                     e.PrintLine(detallePedido.Cantidad.ToString() + " X " + detallePedido.Producto + " " + detallePedido.NombreReferencia),
->>>>>>> Stashed changes
                      e.SetStyles(PrintStyle.None));
                 if (!string.IsNullOrEmpty(detallePedido.Comentario))
                 {
