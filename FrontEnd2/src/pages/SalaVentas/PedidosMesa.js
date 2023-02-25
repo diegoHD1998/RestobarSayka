@@ -204,6 +204,8 @@ const PedidosMesa = () => {
 
                                 if(cont !== 0){
                                     setProductoPedidosRecepcion(false)
+                                }else{
+                                    setProductoPedidosRecepcion(true)
                                 }
 
 
@@ -485,6 +487,7 @@ const PedidosMesa = () => {
                         if(res.status >= 200 && res.status<300){
 
                             _productoPedidos.splice(0,0,res.data)
+                            setProductoPedidosRecepcion(false)
                             console.log(res.data)
 
                         }else if(res.status >= 400 && res.status<500){
@@ -515,6 +518,7 @@ const PedidosMesa = () => {
                             if(res.status >= 200 && res.status<300){
     
                                 _productoPedidos.splice(0,0,res.data)
+                                setProductoPedidosRecepcion(false)
                                 console.log(res.data)
     
                             }else if(res.status >= 400 && res.status<500){
@@ -546,6 +550,7 @@ const PedidosMesa = () => {
                         if(res.status >= 200 && res.status<300){
 
                             _productoPedidos.splice(0,0,res.data)
+                            setProductoPedidosRecepcion(false)
                             console.log(res.data)
 
                         }else if(res.status >= 400 && res.status<500){
@@ -672,11 +677,6 @@ const PedidosMesa = () => {
 
     }
 
-     const productoPedidosRecepcionados = () => {
-         
-     }
-
-
     const showTopLeft = () => {
         toastTL.current.show({severity: 'info', summary: 'Envio a Impresora', detail: 'Los pedidos han sido enviados a imprimir', life: 3000});
     }
@@ -687,7 +687,9 @@ const PedidosMesa = () => {
         .then(res => {
 
             if(res.status >= 200 && res.status < 300){
-
+                console.log(res.data)
+                setProductoPedidos(res.data)
+                setProductoPedidosRecepcion(true)
                 showTopLeft()
 
             }else if(res.status >= 400 && res.status < 500){

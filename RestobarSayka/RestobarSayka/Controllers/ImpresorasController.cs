@@ -121,9 +121,14 @@ namespace RestobarSayka.Controllers
 
 
                 }
-                return Ok();
+
+                var _ProductosPedidos = await _context.ProductoPedidos.ToListAsync();
+
+                var ListaProductoPedidos = _ProductosPedidos.FindAll(value => value.PedidoIdPedido == id);
+
+                return Ok(ListaProductoPedidos);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest("Problema para imprimir revise las impresoras");
             }
