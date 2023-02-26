@@ -23,7 +23,7 @@ import ProductoPedidoService from '../../service/PedidoService/ProductoPedidoSer
 import PedidoService from '../../service/PedidoService/PedidoService';
 import MesaService from '../../service/MesasService/MesaService';
 import VentaService from '../../service/VentaService/VentaService';
-import ImpresoraService from '../../service/Impresora/ImpresoraService';
+import ImpresoraService from '../../service/ImpresoraService/ImpresoraService';
 
 
 const PedidosMesa = () => {

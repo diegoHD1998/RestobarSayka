@@ -22,6 +22,7 @@ import Modificadores from './pages/Productos/Modificadores';
 import Categorias from './pages/Productos/Categorias';
 import Productos from './pages/Productos/Productos';
 import Variantes from './pages/Productos/Variantes';
+import Impresoras from './pages/Productos/Impresoras';
 
 import Roles from './pages/Usuarios/Roles'
 import PedidosMesa from './pages/SalaVentas/PedidosMesa'
@@ -167,6 +168,7 @@ const App = () => {
                 { label: "Categorias", to: "/categoria" },
                 { label: "Variantes", to: "/variantes" },
                 { label: "Modificadores", to: "/modificadores" },
+                { label: "Impresoras", to: "/impresoras" }
             ]
         },
         {
@@ -292,6 +294,7 @@ const App = () => {
                     { privateRouteA2() && <Route exact path="/categoria"  component={Categorias} />}
                     { privateRouteA2() && <Route exact path="/variantes"  component={Variantes} />}
                     { privateRouteA2() && <Route exact path="/modificadores"  component={Modificadores} />}
+                    { privateRouteA1() && <Route exact path="/impresoras" component={Impresoras}/>}
 
                     {/* Usuarios */}
                     { privateRouteA1() && <Route exact path="/lista-administradores"  component={Admins} />}

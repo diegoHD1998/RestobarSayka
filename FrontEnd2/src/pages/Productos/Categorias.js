@@ -20,7 +20,8 @@ export default function Categorias ()  {
         descripcion: '',
         color:'',
         estado:estados[0],
-        tipo:''
+        tipo:'',
+        ipImpresora:''
 
     };
 
@@ -272,6 +273,12 @@ export default function Categorias ()  {
                             <label htmlFor="tipo">Tipo de Categoria</label>
                             <Dropdown id="tipo" value={categoria.tipo} options={tiposCategoria} placeholder='Seleccione Tipo categoria' onChange={(e) => onInputChange(e, 'tipo')} required className={classNames({ 'p-invalid': submitted && !categoria.tipo })}rows={3} cols={20} />
                             {submitted && !categoria.tipo && <small className="p-invalid">Tipo de Categoria Requerido.</small>}
+                        </div>
+
+                        <div className='p-field'>
+                            <label htmlFor='ipImpresora'>IP Impresora</label>
+                            <InputText id='ipImpresora' value={categoria.ipImpresora} onChange={(e) => onInputChange(e, 'ipImpresora')} placeholder='Ingresar IP de Impresora' required className={classNames({ 'p-invalid': submitted && !categoria.ipImpresora })}/>
+                            {submitted && !categoria.ipImpresora && <small className="p-invalid">IP de Impresora Requerida.</small>}
                         </div>
 
                         <div className="p-field">
