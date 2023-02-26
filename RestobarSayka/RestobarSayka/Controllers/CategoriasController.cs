@@ -101,7 +101,7 @@ namespace RestobarSayka.Controllers
             }
             catch
             {
-                BadRequest("La Categoria No fue Guardada");
+                return BadRequest("La Categoria No fue Guardada");
             }
 
             return CreatedAtAction("GetCategoria", new { id = categoria.IdCategoria }, categoria);

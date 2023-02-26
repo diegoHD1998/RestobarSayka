@@ -10,6 +10,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { ColorPicker } from 'primereact/colorpicker';
 import { Dropdown } from 'primereact/dropdown';
 import CategoriaService from '../../service/ProductosService/CategoriaService'
+import ImpresoraService from '../../service/ImpresoraService/ImpresoraService';
 import {estados,tiposCategoria} from '../../service/Variables'
 
 export default function Categorias ()  {
@@ -27,6 +28,7 @@ export default function Categorias ()  {
 
     const [categorias, setCategorias] = useState(null); 
     const [categoria, setCategoria] = useState(emptyProduct);
+    const [impresoras, setImpresoras] = useState(null);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -36,7 +38,7 @@ export default function Categorias ()  {
     const dt = useRef(null);
     
     const categoriaService = new CategoriaService();
-
+    
     useEffect(() => {
         const categoriaService = new CategoriaService();
         categoriaService.readAll().then(res => {
@@ -52,8 +54,22 @@ export default function Categorias ()  {
                 console.log('Error de conexion con Backend, Backend esta abajo ')
                 setloading(false)
             }
-            
         });
+
+        const impresoraService = new ImpresoraService();
+        impresoraService.readAll().then(res => {
+            if(res){
+                if(res.status >= 200 && res.status <300){
+                    setImpresoras(res.data)
+                }else{
+                    console.log('Error al Cargar los Datos de Impresora')
+                }
+            }else{
+                toast.current.show({ severity: 'error', summary: 'Backend No Operativo', detail: `El servidor no responde a las peticiones solicitadas `, life: 20000 });
+                console.log('Error de conexion con Backend, Backend esta abajo ')
+            }
+        });
+
     },[]);
 
 
@@ -264,12 +280,6 @@ export default function Categorias ()  {
 
 
                         <div className="p-field">
-                            <label htmlFor="estado">Estado</label>
-                            <Dropdown id="estado" value={categoria.estado} options={estados} placeholder='Seleccione estado' onChange={(e) => onInputChange(e, 'estado')} required className={classNames({ 'p-invalid': submitted && !categoria.estado })}rows={3} cols={20} />
-                            {submitted && !categoria.estado && <small className="p-invalid">Estado Requerido.</small>}
-                        </div>
-
-                        <div className="p-field">
                             <label htmlFor="tipo">Tipo de Categoria</label>
                             <Dropdown id="tipo" value={categoria.tipo} options={tiposCategoria} placeholder='Seleccione Tipo categoria' onChange={(e) => onInputChange(e, 'tipo')} required className={classNames({ 'p-invalid': submitted && !categoria.tipo })}rows={3} cols={20} />
                             {submitted && !categoria.tipo && <small className="p-invalid">Tipo de Categoria Requerido.</small>}
@@ -277,8 +287,14 @@ export default function Categorias ()  {
 
                         <div className='p-field'>
                             <label htmlFor='ipImpresora'>IP Impresora</label>
-                            <InputText id='ipImpresora' value={categoria.ipImpresora} onChange={(e) => onInputChange(e, 'ipImpresora')} placeholder='Ingresar IP de Impresora' required className={classNames({ 'p-invalid': submitted && !categoria.ipImpresora })}/>
+                            <Dropdown id="ipImpresora" value={categoria.ipImpresora} options={impresoras} optionLabel='nombre' optionValue='ipImpresora'  placeholder='Seleccione Impresora' onChange={(e) => onInputChange(e, 'ipImpresora')} required className={classNames({ 'p-invalid': submitted && !categoria.ipImpresora })}rows={3} cols={20} />
                             {submitted && !categoria.ipImpresora && <small className="p-invalid">IP de Impresora Requerida.</small>}
+                        </div>
+                        
+                        <div className="p-field">
+                            <label htmlFor="estado">Estado</label>
+                            <Dropdown id="estado" value={categoria.estado} options={estados} placeholder='Seleccione estado' onChange={(e) => onInputChange(e, 'estado')} required className={classNames({ 'p-invalid': submitted && !categoria.estado })}rows={3} cols={20} />
+                            {submitted && !categoria.estado && <small className="p-invalid">Estado Requerido.</small>}
                         </div>
 
                         <div className="p-field">
@@ -300,3 +316,6 @@ export default function Categorias ()  {
         </div>
     );
 }
+
+
+

@@ -52,7 +52,7 @@ namespace RestobarSayka.Controllers
         {
             if (id != impresora.IdImpresora)
             {
-                return BadRequest();
+                return BadRequest("Los Ids de Impresora No coinciden");
             }
 
             _context.Entry(impresora).State = EntityState.Modified;
@@ -65,7 +65,7 @@ namespace RestobarSayka.Controllers
             {
                 if (!ImpresoraExists(id))
                 {
-                    return NotFound();
+                    return NotFound("No se a encotrado la Impresora a Modificar");
                 }
                 else
                 {
@@ -73,7 +73,7 @@ namespace RestobarSayka.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(impresora);
         }
 
         // POST: api/Impresoras
@@ -195,14 +195,43 @@ namespace RestobarSayka.Controllers
             var impresora = await _context.Impresoras.FindAsync(id);
             if (impresora == null)
             {
-                return NotFound();
+                return NotFound("La impresora a eliminar no fue encontrada");
             }
 
-            _context.Impresoras.Remove(impresora);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Impresoras.Remove(impresora);
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return BadRequest("La impresora no fue Eliminada");
+            }
 
-            return NoContent();
+            
+
+            return Ok(id);
         }
+
+        // POST: api/Impresoras
+        [HttpPost]
+        public async Task<ActionResult<Impresora>> PostImpresora1( Impresora impresora)
+        {
+            try
+            {
+                _context.Impresoras.Add(impresora);
+                await _context.SaveChangesAsync();
+            }
+            catch 
+            {
+                return BadRequest("La Impresora No fue Guardada");
+            }
+
+            return Ok(impresora);
+        }
+
+
+
 
         private bool ImpresoraExists(int id)
         {
