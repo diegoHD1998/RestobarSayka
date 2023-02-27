@@ -738,6 +738,10 @@ const PedidosMesa = () => {
             await mesaService.update(mesa)
         }
 
+        if(ProductoPedidosRecepcion === false){
+            ImprimirProdutoPedidos()
+        }
+
         history.push("/")
     }
 

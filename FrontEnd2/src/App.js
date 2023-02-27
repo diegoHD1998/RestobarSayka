@@ -14,6 +14,8 @@ import ResumenVentas from './pages/Informes/ResumenVentas';
 import VentasEmpleados from './pages/Informes/VentasEmpleados';
 import VentasProductos from './pages/Informes/VentasProductos';
 import VentasDelDia from './pages/Informes/VentasDelDia';
+import VentasProductos2 from './pages/Informes/VentasProductos2';
+
 
 import Mesas from './pages/MesasZonas/Mesas';
 import Zonas from './pages/MesasZonas/Zonas';
@@ -158,6 +160,7 @@ const App = () => {
                 { label: 'Resumen de Ventas', icon: 'pi pi-fw pi-bookmark', to: '/resumen-ventas' },
                 /* { label: 'Ventas por Empleado', icon: 'pi pi-fw pi-bookmark', to: '/ventas-empleados' }, */
                 { label: 'Ventas por Producto', icon: 'pi pi-fw pi-bookmark', to: '/ventas-producto' },
+                // { label:'ventasProducto2', icon: 'pi pi-fw pi-bookmark', to:'/ventas-producto2'},
             ]
         },
         {
@@ -288,6 +291,7 @@ const App = () => {
                     { privateRouteA1() && <Route exact path="/ventas-dia" component={VentasDelDia} /> }
                     { privateRouteA1() && <Route exact path="/ventas-empleados"  component={VentasEmpleados} />}
                     { privateRouteA1() && <Route exact path="/ventas-producto"  component={VentasProductos} />}
+                    {/* { privateRouteA1() && <Route exact path="/ventas-producto2"  component={VentasProductos2} />} */}
 
                     {/* Productos */}
                     { privateRouteA2() && <Route exact path="/lista-productos"  component={Productos} />}
