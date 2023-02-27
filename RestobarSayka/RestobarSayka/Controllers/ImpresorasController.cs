@@ -128,7 +128,6 @@ namespace RestobarSayka.Controllers
                 return BadRequest("Problema para imprimir revise las impresoras");
             }
         }
-
         private async void ImprimirTicketPedidoAsync(List<TicketPedido> productosPedido, string ipImpresora)
         {
             // Ethernet or WiFi (This uses an Immediate Printer, no live paper status events, but is easier to use)
@@ -140,11 +139,6 @@ namespace RestobarSayka.Controllers
             var encabezado = ByteSplicer.Combine(
                 e.SetStyles(PrintStyle.DoubleWidth),
                 e.PrintLine("------------------------"),
-<<<<<<< Updated upstream
-                
-=======
-
->>>>>>> Stashed changes
                 e.LeftAlign(),
                 e.PrintLine("N Interno: " + productosPedido[0].IdPedido),
                 e.PrintLine(DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss")),
@@ -156,11 +150,7 @@ namespace RestobarSayka.Controllers
                 detalle = ByteSplicer.Combine(detalle,
                      e.LeftAlign(),
                      e.SetStyles(PrintStyle.Bold | PrintStyle.DoubleWidth),
-<<<<<<< Updated upstream
                      e.PrintLine(detallePedido.Cantidad.ToString() + " X " +  detallePedido.Producto + " " + detallePedido.NombreReferencia ),
-=======
-                     e.PrintLine(detallePedido.Cantidad.ToString() + " X " + detallePedido.Producto + " " + detallePedido.NombreReferencia),
->>>>>>> Stashed changes
                      e.SetStyles(PrintStyle.None));
                 if (!string.IsNullOrEmpty(detallePedido.Comentario))
                 {
@@ -178,8 +168,7 @@ namespace RestobarSayka.Controllers
             await printer.WriteAsync( // or, if using and immediate printer, use await printer.WriteAsync
               ByteSplicer.Combine(
                 encabezado,
-                detalle,
-                
+                detalle,                
                 e.PrintLine(""),
                 e.PrintLine(""),
                 e.PrintLine(""),
@@ -189,8 +178,85 @@ namespace RestobarSayka.Controllers
                 e.FullCut()
               )
             );
-
-
+        }
+        public async void ImprimirTicketCancelaAsync(TicketCancelado productoCancelado)
+        {
+            // Ethernet or WiFi (This uses an Immediate Printer, no live paper status events, but is easier to use)
+            var hostnameOrIp = productoCancelado.IpImpresora;
+            var port = 9100;
+            var printer = new ImmediateNetworkPrinter(new ImmediateNetworkPrinterSettings() { ConnectionString = $"{hostnameOrIp}:{port}" });
+            var e = new EPSON();
+            await printer.WriteAsync( // or, if using and immediate printer, use await printer.WriteAsync
+             ByteSplicer.Combine(
+                e.SetStyles(PrintStyle.DoubleWidth),
+                e.PrintLine("------------------------"),
+                e.LeftAlign(),
+                e.PrintLine("N Interno: " + productoCancelado.IdPedido),
+                e.PrintLine("TICKET DE CANCELACION"),
+                e.PrintLine(DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss")),
+                e.PrintLine("Mesa: " + productoCancelado.Mesa),
+                e.PrintLine(productoCancelado.Usuario),
+                e.PrintLine("------------------------"),
+                e.SetStyles(PrintStyle.Bold | PrintStyle.DoubleWidth),
+                e.PrintLine("CANCELADO:"),
+                e.PrintLine(productoCancelado.Cantidad.ToString() + " X " + productoCancelado.Producto + " " + productoCancelado.NombreReferencia),
+                e.SetStyles(PrintStyle.DoubleWidth),
+                e.PrintLine("------------------------"),
+                e.PrintLine(" "),
+                e.PrintLine(" "),
+                e.FullCut()
+                )
+            );
+        }
+        [HttpPost("PreCuenta")]
+        public async void ImprimirPreCuenta(TicketCuenta ticketCuenta)
+        {
+            string ipImpresora = _context.Categoria.Where(c => c.Nombre == "PreCuenta").Select(e => e.IpImpresora).FirstOrDefault();
+            // Ethernet or WiFi (This uses an Immediate Printer, no live paper status events, but is easier to use)
+            var hostnameOrIp = ipImpresora;
+            var port = 9100;
+            var printer = new ImmediateNetworkPrinter(new ImmediateNetworkPrinterSettings() { ConnectionString = $"{hostnameOrIp}:{port}" });
+            var e = new EPSON();
+            byte[] detalle = e.PrintLine("------------------------");
+            var encabezado = ByteSplicer.Combine(
+                e.SetStyles(PrintStyle.DoubleWidth),
+                e.PrintLine("------------------------"),
+                e.CenterAlign(),
+                e.SetStyles(PrintStyle.Bold | PrintStyle.DoubleWidth),
+                e.PrintLine("CERVECERIA SAYKA"),
+                e.SetStyles(PrintStyle.DoubleWidth),
+                e.LeftAlign(),
+                e.PrintLine("N Interno: " + ticketCuenta.IdPedido),
+                e.PrintLine(DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss")),
+                e.PrintLine("Mesa: " + ticketCuenta.Mesa)/*,
+                e.PrintLine(productosPedido[0].Usuario)*/
+                );
+            foreach (var detallePedido in ticketCuenta.productosCuenta)
+            {
+                detalle = ByteSplicer.Combine(detalle,
+                     e.RightAlign(),
+                     e.SetStyles(PrintStyle.FontB),
+                     e.PrintLine(detallePedido.Cantidad.ToString().PadRight(5) + (detallePedido.nombre + " " + detallePedido.NombreReferencia).PadLeft(50) + detallePedido.Total.ToString().PadLeft(10))
+                    );
+            }
+            await printer.WriteAsync( // or, if using and immediate printer, use await printer.WriteAsync
+              ByteSplicer.Combine(
+                encabezado,
+                detalle,
+                e.SetStyles(PrintStyle.DoubleWidth),
+                e.PrintLine("------------------------"),
+                e.PrintLine(" "),
+                e.SetStyles(PrintStyle.DoubleWidth),
+                e.PrintLine("Total:".PadRight(20) + ticketCuenta.Subtotal.ToString().PadLeft(10)),
+                e.PrintLine("Propina Sugerida:".PadRight(20) + ticketCuenta.Propina.ToString().PadLeft(10)),
+                e.PrintLine("Total c/propina".PadRight(20) + ticketCuenta.Total.ToString().PadLeft(10)),
+                e.PrintLine(" "),
+                e.PrintLine("------------------------"),
+                e.PrintLine("Gracias por su preferencia!!"),
+                e.PrintLine(" "),
+                e.FullCut()
+              )
+            );
         }
         // DELETE: api/Impresoras/5
         [HttpDelete("{id}")]
