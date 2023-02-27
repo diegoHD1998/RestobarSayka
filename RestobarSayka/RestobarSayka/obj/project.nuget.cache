@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9D0Z+2ubQERYpSKCVirCxdhHK2n7CeG5+sar2nU94rbfVf25XBpcnaLgLuYoYPnW2Wd1lDZHqCbrHwn81t24fA==",
+  "dgSpecHash": "FUgB2yUQH+91vAgXzJOWvIWZmjebAbOcGxTyR6+t95zI94YS2Pj0ERCZwOAK0eK7OAuQIa4GFXmmIXJR+Kn9tg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\diego\\Desktop\\Restobar2\\RestobarSayka\\RestobarSayka\\RestobarSayka.csproj",
+  "projectFilePath": "C:\\Users\\diego\\Desktop\\RestobarSayka\\RestobarSayka\\RestobarSayka\\RestobarSayka.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\diego\\.nuget\\packages\\escpos_net\\3.0.0\\escpos_net.3.0.0.nupkg.sha512",
     "C:\\Users\\diego\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
