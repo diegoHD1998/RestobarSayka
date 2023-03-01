@@ -218,7 +218,13 @@ namespace RestobarSayka.Controllers
 
                 _context.ProductoPedidos.Remove(productoPedido);
                 await _context.SaveChangesAsync();
-               
+                int productos = _context.ProductoPedidos.Where(p => p.PedidoIdPedido == productoPedido.PedidoIdPedido).Count();
+                if(productos==0)
+                {
+                    var pedido = await _context.Pedidos.FindAsync(productoPedido.PedidoIdPedido);
+                    _context.Pedidos.Remove(pedido);
+                    await _context.SaveChangesAsync();
+                }
             }
             catch
             {
