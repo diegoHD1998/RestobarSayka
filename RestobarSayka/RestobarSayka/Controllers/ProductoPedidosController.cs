@@ -191,29 +191,34 @@ namespace RestobarSayka.Controllers
 
             try
             {
+                if (productoPedido.Recepcion == true)
+                {
+                    var productoCancelado = (from m in _context.Mesas
+                                             join pd in _context.Pedidos on m.IdMesa equals pd.MesaIdMesa
+                                             join pp in _context.ProductoPedidos on pd.IdPedido equals pp.PedidoIdPedido
+                                             join pr in _context.Productos on pp.ProductoIdProducto equals pr.IdProducto
+                                             join c in _context.Categoria on pr.CategoriaIdCategoria equals c.IdCategoria
+                                             join u in _context.Usuarios on pd.UsuarioIdUsuario equals u.IdUsuario
+                                             where pp.IdProductoPedido == id
+                                             select new TicketCancelado
+                                             {
+                                                 IdPedido = pd.IdPedido,
+                                                 Producto = pr.Nombre,
+                                                 NombreReferencia = pp.NombreReferencia,
+                                                 Comentario = pp.Comentario,
+                                                 Cantidad = pp.Cantidad,
+                                                 Mesa = m.Nombre,
+                                                 Usuario = u.Nombre,
+                                                 IdProductoPedido = pp.IdProductoPedido,
+                                                 IpImpresora = c.IpImpresora
+                                             }).FirstOrDefault();
+
+                    impresoras.ImprimirTicketCancelaAsync(productoCancelado);
+                }
+
                 _context.ProductoPedidos.Remove(productoPedido);
                 await _context.SaveChangesAsync();
-                var productoCancelado = (from m in _context.Mesas
-                                       join pd in _context.Pedidos on m.IdMesa equals pd.MesaIdMesa
-                                       join pp in _context.ProductoPedidos on pd.IdPedido equals pp.PedidoIdPedido
-                                       join pr in _context.Productos on pp.ProductoIdProducto equals pr.IdProducto
-                                       join c in _context.Categoria on pr.CategoriaIdCategoria equals c.IdCategoria
-                                       join u in _context.Usuarios on pd.UsuarioIdUsuario equals u.IdUsuario
-                                       where pp.IdProductoPedido == id
-                                         select new TicketCancelado
-                                       {
-                                           IdPedido = pd.IdPedido,
-                                           Producto = pr.Nombre,
-                                           NombreReferencia = pp.NombreReferencia,
-                                           Comentario = pp.Comentario,
-                                           Cantidad = pp.Cantidad,
-                                           Mesa = m.Nombre,
-                                           Usuario = u.Nombre,
-                                           IdProductoPedido = pp.IdProductoPedido,
-                                           IpImpresora = c.IpImpresora
-                                       }).FirstOrDefault();
-
-                impresoras.ImprimirTicketCancelaAsync(productoCancelado);
+               
             }
             catch
             {

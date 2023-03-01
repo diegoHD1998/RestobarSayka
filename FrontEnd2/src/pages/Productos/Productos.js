@@ -10,6 +10,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
 import { InputSwitch } from 'primereact/inputswitch';
+import { FileUpload } from 'primereact/fileupload';
 import ProductoService from '../../service/ProductosService/ProductoService'
 import CategoriaService from '../../service/ProductosService/CategoriaService'
 import VarianteService from '../../service/ProductosService/VarianteService'
@@ -18,6 +19,7 @@ import ModificadorService from '../../service/ProductosService/ModificadorServic
 import OpcionModificadorService from '../../service/ProductosService/OpcionModificadorService'
 import ProductoModificadorService from '../../service/ProductosService/ProductoModificadorService';
 import {estados} from '../../service/Variables'
+import axios from 'axios'
 
 
 
@@ -27,7 +29,7 @@ export default function Productos ()  {
         idProducto: null,
         nombre: '',
         descripcion: '',
-        precio: null,
+        precio: 0,
         imagen:'',
         estado:estados[0],
         categoriaIdCategoria:null,
@@ -357,6 +359,19 @@ export default function Productos ()  {
         return index;
     }
 
+    /* const onUpload = (event) => {
+        const file = event.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+        axios.post('/assets/layout/images', formData)
+          .then(response => {
+            console.log('Archivo cargado con éxito en el servidor.');
+          })
+          .catch(error => {
+            console.error('Error al cargar el archivo en el servidor:', error);
+          });
+    } */
+
     const findIndexByIdM = (id) => {
         let index = -1;
         for (let i = 0; i < modificadores.length; i++) {
@@ -652,7 +667,7 @@ export default function Productos ()  {
                         globalFilter={globalFilter} emptyMessage="Productos No Encontrados."  loading={loading}>
                         
                         <Column field="nombre" header="Nombre" ></Column>
-                        <Column field="descripcion" header="Descripcion" ></Column>
+                        {/* <Column field="descripcion" header="Descripcion" ></Column> */}
                         <Column field="precio" body={MonedaBodyTemplate} header="Precio" ></Column>
                         <Column field="imagen" header="Imagen" ></Column>
                         <Column field="estado" body={statusBodyTemplate} header="Estado" ></Column>
@@ -700,9 +715,14 @@ export default function Productos ()  {
                             {submitted && !producto.estado && <small className="p-invalid">Estado Requerido.</small>}
                         </div>
 
-                        {/* <div className="p-field" >
+                        
+                        <div className="p-field" >
                             <label htmlFor="imagen">Imagen</label>
                             <InputText id="imagen" value={producto.imagen} onChange={(e) => onInputChange(e, 'imagen')}  />
+                        </div>
+
+                        {/* <div className="p-field" >
+                            <FileUpload mode="basic" id='imagen' name="imagen21"  accept="image/*" url='./assets/layout/images/' maxFileSize={1000000} onUpload={onUpload} />
                         </div> */}
 
                         

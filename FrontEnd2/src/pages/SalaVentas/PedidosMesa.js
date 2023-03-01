@@ -79,6 +79,25 @@ const PedidosMesa = () => {
         varianteIdVariante:null
     }
 
+    let emptyPreCuenta = {
+        idPedido: null,
+        mesa: '',
+        productosCuenta: [],
+        subTotal: null,
+        propina: null,
+        total: null,
+        usuario: ''
+    }
+
+    let emptyProductoCuenta = {
+        nombre: '',
+        cantidad: null,
+        precio: null,
+        nombreReferencia: '',
+        total: null,
+        usuario: ''
+    }
+
     let listaDescuentos = [
         {
             name:'10%',
@@ -678,26 +697,101 @@ const PedidosMesa = () => {
     }
 
     const showTopLeft = () => {
-        toastTL.current.show({severity: 'info', summary: 'Envio a Impresora', detail: 'Los pedidos han sido enviados a imprimir', life: 3000});
+        toastTL.current.show({severity: 'info', summary: 'Envio a Impresora', detail: 'Los pedidos han sido enviados a imprimir', life: 5000});
     }
+
+    const showTopLeft2 = () => {
+        toastTL.current.show({severity: 'success', summary: 'Imprimir Pre-Cuenta', detail: 'La Pre-Cuenta a sido Impremida', life: 5000});
+    }
+
 
     const ImprimirProdutoPedidos = async() => {
 
-        await impresoraService.imprimirPedidosMesa(pedido.idPedido)
+        if(ProductoPedidosRecepcion === false){
+
+            await impresoraService.imprimirPedidosMesa(pedido.idPedido)
+            .then(res => {
+    
+                if(res.status >= 200 && res.status < 300){
+                    console.log(res.data)
+                    setProductoPedidos(res.data)
+                    
+                    showTopLeft()
+                    setProductoPedidosRecepcion(true)
+                        
+                    setTimeout(() => {
+                        history.push("/")
+                    }, "15000")
+                    
+    
+                }else if(res.status >= 400 && res.status < 500){
+                    toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+                }else{
+                    console.log(res)
+                    toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Impresora, Status No controlado`, life: 5000 });
+                }
+            })
+        }
+
+    }
+
+    const encontrarNombreProducto = (productoIdProducto) => {
+        if(productos){
+            const _producto = productos?.find(value => value.idProducto === productoIdProducto)
+            return _producto.nombre
+        }
+    }
+
+    const LlenarProductoCuenta = async() => {
+        let _productoCuenta = productoPedidos.map((value) => {
+
+            let _nombreProducto = encontrarNombreProducto(value.productoIdProducto);
+
+            return {
+                ...emptyProductoCuenta,
+                nombre: _nombreProducto,
+                cantidad: value.cantidad,
+                precio: value.precio,
+                nombreReferencia: value.nombreReferencia,
+                total: value.total,
+                usuario: `${user.nombre} ${user.apellido}`
+            }
+
+        });
+
+        return _productoCuenta;
+    }
+
+    const ImprimirPreCuenta = async() => {
+
+        let _productosCuentas = await LlenarProductoCuenta();
+
+        let _preCuenta = {
+            ...emptyPreCuenta,
+            idPedido: pedido.idPedido,
+            mesa: mesa.nombre,
+            productosCuenta: _productosCuentas,
+            subTotal:SubTotal,
+            propina: SubTotal * 0.1,
+            total: SubTotal + (SubTotal * 0.1),
+            usuario: `${user.nombre} ${user.apellido}`
+
+        }
+        console.log(_preCuenta)
+        await impresoraService.imprimirPreCuenta(_preCuenta)
         .then(res => {
 
             if(res.status >= 200 && res.status < 300){
-                console.log(res.data)
-                setProductoPedidos(res.data)
-                setProductoPedidosRecepcion(true)
-                showTopLeft()
+                console.log('Precuenta')
+                showTopLeft2()
 
             }else if(res.status >= 400 && res.status < 500){
                 toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
             }else{
                 console.log(res)
-                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Impresora, Status No controlado`, life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Impresora preCuenta, Status No controlado`, life: 5000 });
             }
+
         })
 
     }
@@ -739,7 +833,7 @@ const PedidosMesa = () => {
         }
 
         if(ProductoPedidosRecepcion === false){
-            ImprimirProdutoPedidos()
+            await ImprimirProdutoPedidos()
         }
 
         history.push("/")
@@ -930,7 +1024,7 @@ const PedidosMesa = () => {
             return(
                 <>
                     <div className="ProductoItem" >
-                        <img src={`/assets/layout/images/sayka-favicon-100x100.png`} alt={rowData.nombre} />
+                        <img src={rowData.imagen} alt={rowData.nombre} />
                         <div className="detalle-producto">
                             <div className="nombreProducto">{rowData?.nombre}</div>
                             <i style={{color:`#${_categoria?.color}`}} className="pi pi-tag categoriaProductoIcon"></i><span className="categoriaProducto">{_categoria?.nombre}</span>
@@ -962,7 +1056,7 @@ const PedidosMesa = () => {
             </div>
 
             <div>
-                <Button label='Pre-Cuenta' disabled={pedido === null ? true : false}  className='p-button-info p-mr-2' />
+                <Button label='Pre-Cuenta' disabled={pedido === null ? true : false}  className='p-button-info p-mr-2' onClick={()=> ImprimirPreCuenta()} />
 
 
                 <Button label='Pedido' disabled={pedido === null ? true : false} className={ProductoPedidosRecepcion === true ? `p-button-secondary p-mr-2` : `p-button-danger p-mr-2`} onClick={()=> ImprimirProdutoPedidos()}/>
@@ -1029,7 +1123,7 @@ const PedidosMesa = () => {
     )
     const header2 = (
         <div>
-            <span><b> {`${producto.nombre.toUpperCase()} ${opcionModificador ? opcionModificador.nombre : ''} : ${formatCurrency(productoPedido.precio)}`}</b> </span>
+            <span><b> {`${producto.nombre.toUpperCase()} ${opcionModificador ? opcionModificador.nombre : ''} : ${formatCurrency(opcionModificador? productoPedido.precio + opcionModificador.precio : productoPedido.precio)}`}</b> </span>
         </div>
     )
     const header3 = (
@@ -1115,19 +1209,19 @@ const PedidosMesa = () => {
 
             <Dialog visible={dialogVisible} style={{width:'600px'}} header={header1} modal className='p-fluid' footer={dialogFooter} onHide={hideDialog} >
                 
-                <div className= 'p-d-flex p-col-12 p-ai-center' /* style={submitted && !productoPedido.precio ? {border: '1px solid red'}:{}} */ >
+                <div>
+                    {submitted && !productoPedido.precio && <small style={{color:'red'}} >*Seleccione Una Opcion</small>}
+                </div>
+                <div className= 'p-d-flex p-flex-wrap' /* style={submitted && !productoPedido.precio ? {border: '1px solid red'}:{}} */ >
                     {
                         opcionesVariantesProducto?.map((value1) => {
                             return(
-                                <div key={value1.idOpcionV} className='p-mr-2 p-my-2 '>
+                                <div key={value1.idOpcionV} className='p-mr-2 p-my-1'>
                                     <Button className={`p-button-outlined p-button-success BotonPedido `} style={submitted && !productoPedido.precio ? {border: '1px solid red'}:{}} label={value1.nombre} onClick={()=>onInputNumberChangeV(value1.precio, 'precio', value1)}/>
                                 </div>
                             )
                         })
                     }
-                    <div>
-                        {submitted && !productoPedido.precio && <small style={{color:'red'}} >*Seleccione Una Opcion</small>}
-                    </div>
                 </div>
 
                 <div className="p-col-12">
@@ -1153,17 +1247,17 @@ const PedidosMesa = () => {
 
             <Dialog visible={dialogVisible2} style={{width:'600px'}} header={header2} modal className='p-fluid' footer={dialogFooter2} onHide={hideDialog2} >
                 
-                <div className= 'p-d-flex p-col-12 p-ai-center'>
+                    <div>
+                        {submitted && !opcionModificador && <small style={{color:'red'}} >*Seleccione Una Opcion</small>}
+                    </div>
+                <div className= 'p-d-flex p-flex-wrap'>
                     {
                         opcionesModificadoresProducto?.map((value1) => 
-                            <div key={value1.idOcionM} className='p-mr-2 p-my-2 '>
+                            <div key={value1.idOcionM} className='p-mr-2 p-my-1 '>
                                 <Button className="p-buttopn-outlined p-button-success" style={submitted && !opcionModificador? {border: '1px solid red'}:{}} label={value1.nombre} onClick={()=>onInputNumberChangeM(value1.precio,'modificadorPrecio',value1)}/>
                             </div>
                         )
                     }
-                    <div>
-                        {submitted && !opcionModificador && <small style={{color:'red'}} >*Seleccione Una Opcion</small>}
-                    </div>
                 </div>
 
                 <div className="p-col-12 ">

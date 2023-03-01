@@ -204,9 +204,14 @@ namespace RestobarSayka.Controllers
                 e.PrintLine("------------------------"),
                 e.SetStyles(PrintStyle.Bold | PrintStyle.DoubleWidth),
                 e.PrintLine("CANCELADO:"),
+                e.SetStyles(PrintStyle.FontB | PrintStyle.DoubleWidth),
                 e.PrintLine(productoCancelado.Cantidad.ToString() + " X " + productoCancelado.Producto + " " + productoCancelado.NombreReferencia),
                 e.SetStyles(PrintStyle.DoubleWidth),
                 e.PrintLine("------------------------"),
+                e.PrintLine(" "),
+                e.PrintLine(" "),
+                e.PrintLine(" "),
+                e.PrintLine(" "),
                 e.PrintLine(" "),
                 e.PrintLine(" "),
                 e.FullCut()
@@ -239,9 +244,9 @@ namespace RestobarSayka.Controllers
             foreach (var detallePedido in ticketCuenta.productosCuenta)
             {
                 detalle = ByteSplicer.Combine(detalle,
-                     e.RightAlign(),
+                     e.LeftAlign(),
                      e.SetStyles(PrintStyle.FontB),
-                     e.PrintLine(detallePedido.Cantidad.ToString().PadRight(5) + (detallePedido.nombre + " " + detallePedido.NombreReferencia).PadLeft(50) + detallePedido.Total.ToString().PadLeft(10))
+                     e.PrintLine(detallePedido.Cantidad.ToString().PadRight(5) + (detallePedido.nombre + " " + detallePedido.NombreReferencia).PadRight(30) + detallePedido.Total.ToString().PadLeft(20))
                     );
             }
             await printer.WriteAsync( // or, if using and immediate printer, use await printer.WriteAsync
@@ -251,13 +256,19 @@ namespace RestobarSayka.Controllers
                 e.SetStyles(PrintStyle.DoubleWidth),
                 e.PrintLine("------------------------"),
                 e.PrintLine(" "),
-                e.SetStyles(PrintStyle.DoubleWidth),
+                e.LeftAlign(),
+                e.SetStyles(PrintStyle.DoubleWidth | PrintStyle.FontB),
                 e.PrintLine("Total:".PadRight(20) + ticketCuenta.Subtotal.ToString().PadLeft(10)),
                 e.PrintLine("Propina Sugerida:".PadRight(20) + ticketCuenta.Propina.ToString().PadLeft(10)),
                 e.PrintLine("Total c/propina".PadRight(20) + ticketCuenta.Total.ToString().PadLeft(10)),
+                e.SetStyles(PrintStyle.DoubleWidth),
                 e.PrintLine(" "),
                 e.PrintLine("------------------------"),
+                e.SetStyles(PrintStyle.DoubleWidth | PrintStyle.FontB),
                 e.PrintLine("Gracias por su preferencia!!"),
+                e.PrintLine(" "),
+                e.PrintLine(" "),
+                e.PrintLine(" "),
                 e.PrintLine(" "),
                 e.FullCut()
               )

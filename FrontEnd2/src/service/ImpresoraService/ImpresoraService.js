@@ -9,6 +9,11 @@ export default class ImpresoraService {
         .catch(err => err.response)
     }
 
+    async imprimirPreCuenta(cuenta){
+        return await axios.post(`${baseUrl}/PreCuenta`, cuenta).then(res => res)
+        .catch(err => err.response)
+    }
+
     async readAll (){
         return await axios.get(baseUrl).then(res => res)
         .catch( err => err.response)
