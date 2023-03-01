@@ -359,18 +359,22 @@ export default function Productos ()  {
         return index;
     }
 
-    /* const onUpload = (event) => {
-        const file = event.files[0];
-        const formData = new FormData();
-        formData.append('file', file);
-        axios.post('/assets/layout/images', formData)
-          .then(response => {
-            console.log('Archivo cargado con éxito en el servidor.');
-          })
-          .catch(error => {
-            console.error('Error al cargar el archivo en el servidor:', error);
-          });
-    } */
+    const onUpload = ({files}) => {
+        const [file] = files;
+        const fileReader = new FileReader();
+        fileReader.onload = (e) => {
+            uploadInvoice(e.target.result);
+        };
+        fileReader.readAsDataURL(file);
+    };
+
+    const uploadInvoice = async (invoiceFile) => {
+        let formData = new FormData();
+        formData.append('invoiceFile', invoiceFile);
+    
+        const response = await axios.post(`${process.env.REACT_APP_URL_BASE}/Productos/CargarImagen`, formData)
+            
+    };
 
     const findIndexByIdM = (id) => {
         let index = -1;
@@ -478,6 +482,10 @@ export default function Productos ()  {
 
         return rowData.precio ? rowData.precio.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits:0}) : '';
 
+    }
+
+    const ImagenBodyTemplate = (rowData) => {
+        return <img src={rowData.imagen} style={{width:'60px'}} alt={rowData.nombre} />
     }
 
     const statusBodyTemplate = (rowData) => {
@@ -669,7 +677,7 @@ export default function Productos ()  {
                         <Column field="nombre" header="Nombre" ></Column>
                         {/* <Column field="descripcion" header="Descripcion" ></Column> */}
                         <Column field="precio" body={MonedaBodyTemplate} header="Precio" ></Column>
-                        <Column field="imagen" header="Imagen" ></Column>
+                        <Column field="imagen" header="Imagen" body={ImagenBodyTemplate} ></Column>
                         <Column field="estado" body={statusBodyTemplate} header="Estado" ></Column>
                         <Column field="varianteIdVariante" body={VarianteBodyTemplate} header="Variante" ></Column>
                         <Column field="categoriaIdCategoria" body={ColorBodytemplate} header="Categoria" ></Column>
@@ -716,14 +724,14 @@ export default function Productos ()  {
                         </div>
 
                         
-                        <div className="p-field" >
+                        {/* <div className="p-field" >
                             <label htmlFor="imagen">Imagen</label>
                             <InputText id="imagen" value={producto.imagen} onChange={(e) => onInputChange(e, 'imagen')}  />
-                        </div>
-
-                        {/* <div className="p-field" >
-                            <FileUpload mode="basic" id='imagen' name="imagen21"  accept="image/*" url='./assets/layout/images/' maxFileSize={1000000} onUpload={onUpload} />
                         </div> */}
+
+                        <div className="p-field" >
+                            <FileUpload mode="basic" id='imagen' name="imagen21" auto accept="image/*" maxFileSize={1000000} uploadHandlerk={onUpload} />
+                        </div>
 
                         
                         <div className="p-field">
