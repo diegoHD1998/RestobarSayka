@@ -92,6 +92,63 @@ namespace RestobarSayka.Controllers
 
             return Ok(mesa);
         }
+        [HttpPost("TransferirMesa")]
+        public async Task<ActionResult> TransferirMesa(int IdPedido, int IdMesa)
+        {
+            try
+            {
+                var pedido = await _context.Pedidos.FindAsync(IdPedido);
+                pedido.MesaIdMesa = IdMesa;
+                _context.Entry(pedido).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return BadRequest("El pedido no fue modificado");
+            }
+
+            return Ok();
+        }
+        [HttpPost("DividirPedido")]
+        public async Task<ActionResult> DividirPedido(List<ProductoPedido> ProductosPedidos, int IdMesa, int IdUsuario)
+        {
+            try
+            {
+                var pedido = await _context.Pedidos.Where(p=>p.MesaIdMesa ==IdMesa && p.Estado ==true).FirstOrDefaultAsync();
+                if(pedido == null)
+                {
+                    var nuevoPedido = new Pedido();
+                    nuevoPedido.Fecha = DateTime.Today;
+                    nuevoPedido.Estado = true;
+                    nuevoPedido.UsuarioIdUsuario = IdUsuario;
+                    nuevoPedido.MesaIdMesa = IdMesa;
+                    _context.Pedidos.Add(nuevoPedido);
+                    await _context.SaveChangesAsync();
+                    foreach (var item in ProductosPedidos)
+                    {
+                        item.PedidoIdPedido = nuevoPedido.IdPedido;
+                        _context.Entry(item).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                else
+                {
+                    foreach (var item in ProductosPedidos)
+                    {
+                        item.PedidoIdPedido = pedido.IdPedido;
+                        _context.Entry(item).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                
+            }
+            catch
+            {
+                return BadRequest("El pedido no fue modificado");
+            }
+
+            return Ok();
+        }
 
         // DELETE: api/Mesas/5
         [HttpDelete("{id}")]
