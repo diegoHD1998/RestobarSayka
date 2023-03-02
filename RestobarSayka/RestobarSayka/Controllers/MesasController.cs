@@ -29,6 +29,15 @@ namespace RestobarSayka.Controllers
             return Ok(mesas);
         }
 
+        // GET: api/Mesas/disponibles
+        [HttpGet("disponibles")]
+        public async Task<ActionResult<IEnumerable<Mesa>>> GetMesasDisponibles()
+        {
+            var mesas = await _context.Mesas.Where(m => m.Disponibilidad == false).ToListAsync();
+            return Ok(mesas);
+        }
+
+
         // GET: api/Mesas/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Mesa>> GetMesa(int id)
@@ -92,13 +101,19 @@ namespace RestobarSayka.Controllers
 
             return Ok(mesa);
         }
-        [HttpPost("TransferirMesa")]
+        [HttpPost("TransferirMesa/{IdPedido}/{IdMesa}")]
         public async Task<ActionResult> TransferirMesa(int IdPedido, int IdMesa)
         {
             try
             {
+                
                 var pedido = await _context.Pedidos.FindAsync(IdPedido);
+                var mesa = await _context.Mesas.FindAsync(pedido.MesaIdMesa);
+                mesa.Disponibilidad = false;
+                _context.Entry(mesa).State = EntityState.Modified;
+
                 pedido.MesaIdMesa = IdMesa;
+                
                 _context.Entry(pedido).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }

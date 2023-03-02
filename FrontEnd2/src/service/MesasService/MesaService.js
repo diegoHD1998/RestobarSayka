@@ -25,4 +25,13 @@ export default class MesaService {
         .catch(err =>  err.response)
     }
 
+    async readMesasDisponibles(){
+        return await axios.get(`${baseUrl}/disponibles`).then(res => res)
+        .catch(err => err.response)
+    }
+
+    async transferirMesa(IdPedido, IdMesa){
+        return await axios.post(`${baseUrl}/TransferirMesa/${IdPedido}/${IdMesa}`)
+    }
+
 }

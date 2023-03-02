@@ -371,8 +371,9 @@ export default function Productos ()  {
     const uploadInvoice = async (invoiceFile) => {
         let formData = new FormData();
         formData.append('invoiceFile', invoiceFile);
-    
+        console.log(formData)
         const response = await axios.post(`${process.env.REACT_APP_URL_BASE}/Productos/CargarImagen`, formData)
+        console.log('estoy aqui en imagen')
             
     };
 
@@ -724,14 +725,14 @@ export default function Productos ()  {
                         </div>
 
                         
-                        {/* <div className="p-field" >
+                        <div className="p-field" >
                             <label htmlFor="imagen">Imagen</label>
                             <InputText id="imagen" value={producto.imagen} onChange={(e) => onInputChange(e, 'imagen')}  />
-                        </div> */}
-
-                        <div className="p-field" >
-                            <FileUpload mode="basic" id='imagen' name="imagen21" auto accept="image/*" maxFileSize={1000000} uploadHandlerk={onUpload} />
                         </div>
+
+                        {/* <div className="p-field" >
+                            <FileUpload mode="basic" id='imagen' customUpload name="imagen21" auto accept="image/*" maxFileSize={1000000} uploadHandler={onUpload} />
+                        </div> */}
 
                         
                         <div className="p-field">

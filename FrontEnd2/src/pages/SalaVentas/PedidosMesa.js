@@ -132,6 +132,7 @@ const PedidosMesa = () => {
     const [productoPedidos, setProductoPedidos] = useState([]) // ProductoPedidos de la mesa actual
     const [categoriaSelected, setCategoriaSelected] = useState(null)
     const [porcentajeSelected, setPorcentajeSelected] = useState(undefined)
+    const [mesas, setMesas] = useState([])
 
     const [opcionVariantes, setOpcionVariantes] = useState(null)
     const [opcionesVariantesProducto, setOpcionesVariantesProducto] = useState(null)
@@ -140,10 +141,11 @@ const PedidosMesa = () => {
     const [opcionModificadores, setOpcionModificadores] = useState(null)
     const [opcionesModificadoresProducto, setOpcionesModificadoresProducto] = useState(null)
 
-    const [swit, setSwit] = useState(false) 
+    const [swit, setSwit] = useState(true) 
     const [textoPropina, setTextoPropina] = useState('')
     
     const [selected, setSelected] = useState(null);
+    const [selectedTransferenciaMesa,setSelectedTransferenciaMesa] = useState(null)
     const toast = useRef(null);
     const toastTL = useRef(null);
     const dt = useRef(null)
@@ -154,8 +156,11 @@ const PedidosMesa = () => {
     const [dialogVisibleVenta, setDialogVisibleVenta] = useState(false);
     const [dialogEfectivo, setDialogEfectivo] = useState(false);
     const [dialogTarjeta, setDialogTarjeta] = useState(false);
-
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
+    const [preTransferenciaMesaDialog, setpreTransferenciaMesaDialog] = useState(false);
+    const [TransferenciaMesaDialog, setTransferenciaMesaDialog] = useState(false);
+
+
     const [SubTotal, setSubTotal] = useState(0)//---------------------------------
     const [Total, setTotal] = useState(0)//---------------------------------
     const [Propina, setPropina] = useState(0)//---------------------------------
@@ -314,6 +319,11 @@ const PedidosMesa = () => {
         selectProducto(value)
     }
 
+    const cambiarSelectTranferirMesa = (value) => {
+        console.log(value)
+        setSelectedTransferenciaMesa(value)
+    }
+
     const selectProducto = (_producto) => {
         console.log(_producto)
         setProducto(_producto);
@@ -397,6 +407,15 @@ const PedidosMesa = () => {
     const hideDeleteProductDialog = () => {
         setDeleteProductDialog(false);
         setProductoPedido(emptyProductoPedido)
+    }
+
+    const hidePreTransferirMesa = () => {
+        setpreTransferenciaMesaDialog(false)
+        setSelectedTransferenciaMesa(null)
+    }
+
+    const hideTransferenciaMesa = () => {
+        setTransferenciaMesaDialog(false)
     }
     
     const hideDialogVenta = () =>{
@@ -721,7 +740,7 @@ const PedidosMesa = () => {
                         
                     setTimeout(() => {
                         history.push("/")
-                    }, "15000")
+                    }, "120000")
                     
     
                 }else if(res.status >= 400 && res.status < 500){
@@ -890,6 +909,43 @@ const PedidosMesa = () => {
         setGuardadoManualDescuento(false)
     }
 
+    const PreTransferirMesa = async() => {
+
+        await mesaService.readMesasDisponibles().then(res => {
+            if(res.status >= 200 && res.status < 300){
+                setMesas(res.data)
+                setpreTransferenciaMesaDialog(true)
+
+            }else if(res.status >= 400 && res.status < 500){
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+            }else{
+                console.log(res)
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `error al buscar mesas, Status No controlado`, life: 5000 });
+            }
+        })
+
+        
+    }
+
+    const abrirTranferirMesa = () => {
+        setTransferenciaMesaDialog(true)
+    }
+
+    const TransferirMesa = () => {
+
+
+
+
+
+
+
+
+
+        setTransferenciaMesaDialog(false)
+        setpreTransferenciaMesaDialog(false)
+        history.push("/")
+
+    }
 
 
     const descuentoTempalte = <span style={{color:'red'}}><b> %</b></span>
@@ -1038,6 +1094,19 @@ const PedidosMesa = () => {
         }
     }
 
+    const MesasTemplate = (rowData) => {
+
+        return(
+            <>
+                <div className="ProductoItem" >
+                    <div className="detalle-producto">
+                        <div className="nombreProducto">{rowData?.nombre}</div>
+                    </div>
+                </div>
+            </>
+        )
+    }
+
     const actionBodyTemplate = (rowData) => {
         return (
             <div className="actions">
@@ -1056,11 +1125,11 @@ const PedidosMesa = () => {
             </div>
 
             <div>
+                <Button icon='pi pi-cog' disabled={pedido === null ? true : false} className='p-button-rounded p-mr-3' onClick={() => PreTransferirMesa()}/>
+
                 <Button label='Pre-Cuenta' disabled={pedido === null ? true : false}  className='p-button-info p-mr-2' onClick={()=> ImprimirPreCuenta()} />
 
-
                 <Button label='Pedido' disabled={pedido === null ? true : false} className={ProductoPedidosRecepcion === true ? `p-button-secondary p-mr-2` : `p-button-danger p-mr-2`} onClick={()=> ImprimirProdutoPedidos()}/>
-
 
                 <Button label='Pagar' disabled={pedido === null ? true : false}  className='p-button-success' onClick={()=> PreCobrar() } />
             </div>
@@ -1098,6 +1167,21 @@ const PedidosMesa = () => {
             <Button label="Si" icon="pi pi-check" className="p-button-text" onClick={deleteProduct} />
         </>
     );
+
+    const PreTransferirMesaDialogFooter = (
+        <>
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hidePreTransferirMesa} />
+            <Button label="Cambiar" icon="pi pi-check" className="p-button-text" onClick={abrirTranferirMesa} />
+        </>
+    );
+
+    const TransferirMesaDialogFooter = (
+        <>
+            <Button label="No" icon="pi pi-times" className="p-button-danger" onClick={hideTransferenciaMesa} />
+            <Button label="Si" icon="pi pi-check" className="p-button-success" onClick={TransferirMesa} />
+        </>
+    );
+
     
     const header = (
         <div className='p-d-flex p-jc-between' >
@@ -1413,6 +1497,30 @@ const PedidosMesa = () => {
                 </div>
 
             </Dialog>
+
+
+            <Dialog visible={TransferenciaMesaDialog} style={{ width: '450px' }} header="Confirmar" modal footer={TransferirMesaDialogFooter} onHide={hideTransferenciaMesa}>
+                <div className="confirmation-content">
+                    <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem' }} />
+                    { <span>Estas seguro que quieres Transferir los productos de esta mesa a otra?</span>}
+                </div>
+            </Dialog>
+
+
+
+
+            <Dialog visible={preTransferenciaMesaDialog} style={{ width: '600px' }} header={`${name}: Seleccione la mesa hacia donde enviar los productos`} modal footer={PreTransferirMesaDialogFooter} onHide={hidePreTransferirMesa} >
+                    
+                <DataTable ref={dt} dataKey='idMesa' value={mesas} scrollable scrollHeight='400px'  
+                 selection={selectedTransferenciaMesa} onSelectionChange={e => cambiarSelectTranferirMesa(e.value)} globalFilter={globalFilter}  selectionMode="single" emptyMessage='No hay Mesas Disponibles'>
+                    <Column field='nombre' /* headerStyle={{display:'none'}} */ header={selectedTransferenciaMesa !== null ? `La Mesa Seleccionada es: ${selectedTransferenciaMesa.nombre}` : ''} body={MesasTemplate} />
+                </DataTable>
+
+            </Dialog>
+
+
+            
+
 
         </div>
     );

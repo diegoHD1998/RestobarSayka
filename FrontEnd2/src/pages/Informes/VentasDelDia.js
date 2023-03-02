@@ -105,7 +105,13 @@ const VentasDelDia = () => {
     },[fecha]);
     
     const lineData = {
-        labels: VentasD.map((value) => `${value.hora.hours}:${value.hora.minutes}:${value.hora.seconds}`),
+        labels: VentasD.map((value) => {
+
+            let _hora = value.hora
+            let _tiempo = _hora.split(".")
+            return _tiempo[0]
+
+        }),
         datasets: [{
             label: "Ventas",
             data: VentasD.map((value) => value.total),
