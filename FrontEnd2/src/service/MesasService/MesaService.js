@@ -30,8 +30,15 @@ export default class MesaService {
         .catch(err => err.response)
     }
 
-    async transferirMesa(IdPedido, IdMesa){
-        return await axios.post(`${baseUrl}/TransferirMesa/${IdPedido}/${IdMesa}`)
+    async transferirMesa(transferencia){
+        console.log('pase aqui 1')
+        console.log(transferencia)
+        return await axios.post(`${baseUrl}/TransferirMesa`, transferencia).then(res => {
+            console.log('pase aqui 2')
+            console.log(res)
+            return res
+        })
+        .catch(err => err.response)
     }
 
 }

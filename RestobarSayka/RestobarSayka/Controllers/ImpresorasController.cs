@@ -108,7 +108,7 @@ namespace RestobarSayka.Controllers
                                            }).ToList();
                     if (productosPedido.Count > 0)
                     {
-                        ImprimirTicketPedidoAsync(productosPedido, itemIp);
+                        await  ImprimirTicketPedidoAsync(productosPedido, itemIp);
                         foreach (var item in productosPedido)
                         {
                             var productoPedido = await _context.ProductoPedidos.FindAsync(item.IdProductoPedido);
@@ -133,11 +133,13 @@ namespace RestobarSayka.Controllers
                 return BadRequest("Problema para imprimir revise las impresoras");
             }
         }
-        private async void ImprimirTicketPedidoAsync(List<TicketPedido> productosPedido, string ipImpresora)
+        private async Task<bool> ImprimirTicketPedidoAsync(List<TicketPedido> productosPedido, string ipImpresora)
         {
             // Ethernet or WiFi (This uses an Immediate Printer, no live paper status events, but is easier to use)
-            var hostnameOrIp = ipImpresora;
-            var port = 9100;
+            //var hostnameOrIp = ipImpresora;
+            var hostnameOrIp = "192.168.1.47";
+            //var port = 9100;
+            var port = 17425;
             var printer = new ImmediateNetworkPrinter(new ImmediateNetworkPrinterSettings() { ConnectionString = $"{hostnameOrIp}:{port}" });
             var e = new EPSON();
             byte[] detalle = e.PrintLine("------------------------");
@@ -183,8 +185,9 @@ namespace RestobarSayka.Controllers
                 e.FullCut()
               )
             );
+            return true;
         }
-        public async void ImprimirTicketCancelaAsync(TicketCancelado productoCancelado)
+        public async Task<bool> ImprimirTicketCancelaAsync(TicketCancelado productoCancelado)
         {
             // Ethernet or WiFi (This uses an Immediate Printer, no live paper status events, but is easier to use)
             var hostnameOrIp = productoCancelado.IpImpresora;
@@ -217,6 +220,7 @@ namespace RestobarSayka.Controllers
                 e.FullCut()
                 )
             );
+            return true;
         }
         [HttpPost("PreCuenta")]
         public async void ImprimirPreCuenta(TicketCuenta ticketCuenta)

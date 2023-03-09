@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestobarSayka.Data;
+using RestobarSayka.Dtos;
 using RestobarSayka.Models;
 
 namespace RestobarSayka.Controllers
@@ -101,28 +102,45 @@ namespace RestobarSayka.Controllers
 
             return Ok(mesa);
         }
-        [HttpPost("TransferirMesa/{IdPedido}/{IdMesa}")]
-        public async Task<ActionResult> TransferirMesa(int IdPedido, int IdMesa)
+
+        [HttpPost("TransferirMesa")]
+        public async Task<ActionResult<Mesa>> TransferirMesa(TranferenciaDto value)
         {
+            Mesa mesaDestino;
             try
             {
                 
-                var pedido = await _context.Pedidos.FindAsync(IdPedido);
-                var mesa = await _context.Mesas.FindAsync(pedido.MesaIdMesa);
-                mesa.Disponibilidad = false;
-                _context.Entry(mesa).State = EntityState.Modified;
+                var pedido = await _context.Pedidos.FindAsync(value.IdPedido);
+                var mesaOriginal = await _context.Mesas.FindAsync(pedido.MesaIdMesa);
+                mesaDestino = await _context.Mesas.FindAsync(value.IdMesa);
 
-                pedido.MesaIdMesa = IdMesa;
-                
+                mesaOriginal.Disponibilidad = false;
+                _context.Entry(mesaOriginal).State = EntityState.Modified;
+
+                pedido.MesaIdMesa = value.IdMesa;
+                mesaDestino.Disponibilidad = true;
+                _context.Entry(mesaDestino).State = EntityState.Modified;
+
                 _context.Entry(pedido).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
+
+                
             }
             catch
             {
                 return BadRequest("El pedido no fue modificado");
             }
 
-            return Ok();
+            return Ok(new Mesa
+            {
+             IdMesa = mesaDestino.IdMesa,
+             Nombre = mesaDestino.Nombre,
+             ZonaIdZona = mesaDestino.ZonaIdZona,
+             Disponibilidad = mesaDestino.Disponibilidad
+
+            });
+
+
         }
         [HttpPost("DividirPedido")]
         public async Task<ActionResult> DividirPedido(List<ProductoPedido> ProductosPedidos, int IdMesa, int IdUsuario)

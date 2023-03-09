@@ -29,7 +29,7 @@ const VentasProductos = () => {
 
     let fecha =  useMemo(() => {
         let date = new Date()
-        date.setDate(date.getDate()-30)
+        //date.setDate(date.getDate()-30)
         return date
     },[]);
 

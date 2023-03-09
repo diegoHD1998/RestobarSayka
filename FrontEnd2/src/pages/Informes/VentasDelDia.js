@@ -47,6 +47,10 @@ const VentasDelDia = () => {
     const [VentaNeta, setVentaNeta] = useState(0)
     const [Propinas , setPropinas] = useState(0)
 
+    const [Efectivo, setEfectivo] = useState(0)
+    const [Tarjeta, setTarjeta] = useState(0)
+    const [Transfe, setTransfe] = useState(0)
+
     const storedProcedureVentas = new StoredProcedureVentas()
 
     addLocale('es', {
@@ -67,18 +71,44 @@ const VentasDelDia = () => {
             date1:`${fecha.getFullYear()}-${fecha.getMonth()+1}-${fecha.getDate()}`,
         }
         console.log(fechas)
-        
+
         const storedProcedureVentas = new StoredProcedureVentas()
+
+        /* storedProcedureVentas.GetVentasDelDiaTotales(fechas).then(res => {
+            if(res){
+                if(res.status >= 200 && res.status < 300){
+                    setVentaBruta(res.data.total)
+                    setVentaNeta(res.data.subTotal)
+                    setPropinas(res.data.propina)
+                }else{
+                    console.log(res.data)
+                    console.log('Error de status No controlado')
+                }
+            }else{
+                console.log('Backend Abajo')
+            }
+        }) */
+
         storedProcedureVentas.GetVentasDelDia(fechas).then(res => {
             if(res){
                 if(res.status >= 200 && res.status < 300){
                     setVentasD(res.data)
-                    let bruta = res.data.reduce((acc, el) => acc + el.total,0)
-                    let neta = res.data.reduce((acc, el) => acc + el.subTotal,0)
-                    let propina = res.data.reduce((acc, el) => acc + el.propina,0)
+                    let datos = [...res.data]
+
+                    let _efectivo = datos.reduce((acc, el) => el.tipoPago === 1 ? acc + el.total : acc ,0)
+                    let _tarjeta  = datos.reduce((acc, el) => el.tipoPago === 2 ? acc + el.total : acc ,0)
+                    let _transfe  = datos.reduce((acc, el) => el.tipoPago === 3 ? acc + el.total : acc ,0)
+                    let bruta = datos.reduce((acc, el) => acc + el.total,0)
+                    let neta = datos.reduce((acc, el) => acc + el.subTotal,0)
+                    let propina = datos.reduce((acc, el) => acc + el.propina,0)
                     setVentaBruta(bruta)
                     setVentaNeta(neta)
                     setPropinas(propina)
+
+                    setEfectivo(_efectivo)
+                    setTarjeta(_tarjeta)
+                    setTransfe(_transfe)
+                    
                 }else{
                     console.log(res.data)
                     console.log('Error de status No controlado')
@@ -179,12 +209,6 @@ const VentasDelDia = () => {
                 data: VentasEmpleados.map((value) => value.totales),
                 
             },
-            {
-                label: "Propina",
-                borderColor: '#FFA726',
-                backgroundColor: 'rgba(255,167,38,0.2)',
-                data: VentasEmpleados.map((value) => value.propina),
-            },
         ],
     };
 
@@ -230,17 +254,43 @@ const VentasDelDia = () => {
         let _fechas = {...Fecha};
         _fechas[`${name}`] = val;
         setFecha(_fechas)
+
+        /* await storedProcedureVentas.GetVentasDelDiaTotales(_fechas).then(res => {
+            if(res){
+                if(res.status >= 200 && res.status < 300){
+                    setVentaBruta(res.data.total)
+                    setVentaNeta(res.data.subTotal)
+                    setPropinas(res.data.propina)
+                }else{
+                    console.log(res.data)
+                    console.log('Error de status No controlado')
+                }
+            }else{
+                console.log('Backend Abajo')
+            }
+        }); */
+        
         
         await storedProcedureVentas.GetVentasDelDia(_fechas).then(res => {
             if(res){
                 if(res.status >= 200 && res.status < 300){
                     setVentasD(res.data)
-                    let bruta = res.data.reduce((acc, el) => acc + el.total,0)
-                    let neta = res.data.reduce((acc, el) => acc + el.subTotal,0)
-                    let propina = res.data.reduce((acc, el) => acc + el.propina,0)
+
+                    let datos = [...res.data]
+
+                    let _efectivo = datos.reduce((acc, el) => el.tipoPago === 1 ? acc + el.total : acc ,0)
+                    let _tarjeta  = datos.reduce((acc, el) => el.tipoPago === 2 ? acc + el.total : acc ,0)
+                    let _transfe  = datos.reduce((acc, el) => el.tipoPago === 3 ? acc + el.total : acc ,0)
+                    let bruta = datos.reduce((acc, el) => acc + el.total,0)
+                    let neta = datos.reduce((acc, el) => acc + el.subTotal,0)
+                    let propina = datos.reduce((acc, el) => acc + el.propina,0)
                     setVentaBruta(bruta)
                     setVentaNeta(neta)
                     setPropinas(propina)
+
+                    setEfectivo(_efectivo)
+                    setTarjeta(_tarjeta)
+                    setTransfe(_transfe)
                 }else{
                     console.log(res.data)
                     console.log('Error de status No controlado')
@@ -262,7 +312,7 @@ const VentasDelDia = () => {
             }else{
                 console.log('Backend Abajo')
             }
-        })
+        });
         
     }
 
@@ -271,14 +321,6 @@ const VentasDelDia = () => {
         return rowData.totales ? rowData.totales.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits:0}) : '';
 
     }
-
-    const MonedaBodyTemplatePropina = (rowData) => {
-
-        return rowData.propina ? rowData.propina.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits:0}) : '';
-
-    }
-
-
 
     const NombreApellidoTemplate = (rowData) => {
         return `${rowData?.nombre} ${rowData?.apellido}`
@@ -304,7 +346,7 @@ const VentasDelDia = () => {
                             Ventas Totales
                         </h6>
                     </div>
-                    <span className='Valores'>{VentaBruta.toLocaleString("es-CL",{style:"currency", currency:"CLP"})}</span>
+                    <span className='Valores'>{VentaBruta?.toLocaleString("es-CL",{style:"currency", currency:"CLP"})}</span>
                 </div>
 
                 <div className='p-card contenedor'>
@@ -313,7 +355,7 @@ const VentasDelDia = () => {
                             Ventas SubTotales
                         </h6>
                     </div>
-                    <span className='Valores'>{VentaNeta.toLocaleString("es-CL",{style:"currency", currency:"CLP"})}</span>
+                    <span className='Valores'>{VentaNeta?.toLocaleString("es-CL",{style:"currency", currency:"CLP"})}</span>
                 </div>
 
                 <div className='p-card contenedor'>
@@ -322,8 +364,35 @@ const VentasDelDia = () => {
                             Propinas
                         </h6>
                     </div>
-                    <span className='Valores'>{Propinas.toLocaleString("es-CL",{style:"currency", currency:"CLP"})}</span>
+                    <span className='Valores'>{Propinas?.toLocaleString("es-CL",{style:"currency", currency:"CLP"})}</span>
                 </div>
+
+                <div className='p-card contenedor'>
+                    <div>
+                        <h6 className='TituloVentas'>
+                            Efectivo
+                        </h6>
+                    </div>
+                    <span className='Valores'>{Efectivo?.toLocaleString("es-CL",{style:"currency", currency:"CLP"})}</span>
+                </div>
+
+                <div className='p-card contenedor'>
+                    <div>
+                        <h6 className='TituloVentas'>
+                            Trajeta
+                        </h6>
+                    </div>
+                    <span className='Valores'>{Tarjeta?.toLocaleString("es-CL",{style:"currency", currency:"CLP"})}</span>
+                </div>
+
+                {/* <div className='p-card contenedor'>
+                    <div>
+                        <h6 className='TituloVentas'>
+                            Transferencia
+                        </h6>
+                    </div>
+                    <span className='Valores'>{Transfe?.toLocaleString("es-CL",{style:"currency", currency:"CLP"})}</span>
+                </div> */}
 
             </div>
 
@@ -341,7 +410,6 @@ const VentasDelDia = () => {
                         <DataTable value={VentasEmpleados} header='Detalle Ventas Empleados' responsiveLayout="scroll">
                             <Column  header="Nombre" body={NombreApellidoTemplate}></Column>
                             <Column  header="Total" body={MonedaBodyTemplate} ></Column>
-                            <Column  header="Propina" body={MonedaBodyTemplatePropina} ></Column>
                         </DataTable>
                     </div>
 

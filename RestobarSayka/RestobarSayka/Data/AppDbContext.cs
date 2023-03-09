@@ -45,6 +45,7 @@ namespace RestobarSayka.Data
         public virtual DbSet<SP_VentasSubTotales>SP_VentasSubTotaless { get; set; }
         public virtual DbSet<SP_VentasTotales>SP_VentasTotaless  { get; set; }
         public virtual DbSet<SP_VentasDelDia>SP_VentasDelDias { get; set; }
+        public virtual DbSet<SP_VentasDelDiaTotales> SP_VentasDelDiaTotales { get; set; }
         public virtual DbSet<SP_ProductoPedido>SP_Productopedido { get; set; }
 
 
@@ -453,6 +454,11 @@ namespace RestobarSayka.Data
             });
 
             modelBuilder.Entity<SP_VentasDelDia>(entity =>
+            {
+                entity.HasNoKey();
+            });
+
+            modelBuilder.Entity<SP_VentasDelDiaTotales>(entity =>
             {
                 entity.HasNoKey();
             });

@@ -158,9 +158,9 @@ const App = () => {
             items: [
                 { label: 'Ventas del Dia', icon: 'pi pi-fw pi-bookmark' , to: '/ventas-dia'},
                 { label: 'Resumen de Ventas', icon: 'pi pi-fw pi-bookmark', to: '/resumen-ventas' },
+                { label:'Ventas por Producto', icon: 'pi pi-fw pi-bookmark', to:'/ventas-producto2'},
                 /* { label: 'Ventas por Empleado', icon: 'pi pi-fw pi-bookmark', to: '/ventas-empleados' }, */
-                { label: 'Ventas por Producto', icon: 'pi pi-fw pi-bookmark', to: '/ventas-producto' },
-                // { label:'ventasProducto2', icon: 'pi pi-fw pi-bookmark', to:'/ventas-producto2'},
+                /* { label: 'Ventas por Producto', icon: 'pi pi-fw pi-bookmark', to: '/ventas-producto' }, */
             ]
         },
         {
@@ -290,8 +290,8 @@ const App = () => {
                     { privateRouteA1() && <Route exact path="/resumen-ventas"  component={ResumenVentas} /> }
                     { privateRouteA1() && <Route exact path="/ventas-dia" component={VentasDelDia} /> }
                     { privateRouteA1() && <Route exact path="/ventas-empleados"  component={VentasEmpleados} />}
-                    { privateRouteA1() && <Route exact path="/ventas-producto"  component={VentasProductos} />}
-                    {/* { privateRouteA1() && <Route exact path="/ventas-producto2"  component={VentasProductos2} />} */}
+                    {/* { privateRouteA1() && <Route exact path="/ventas-producto"  component={VentasProductos} />} */}
+                    { privateRouteA1() && <Route exact path="/ventas-producto2"  component={VentasProductos2} />}
 
                     {/* Productos */}
                     { privateRouteA2() && <Route exact path="/lista-productos"  component={Productos} />}

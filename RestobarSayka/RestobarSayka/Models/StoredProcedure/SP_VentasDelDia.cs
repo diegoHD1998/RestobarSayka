@@ -14,5 +14,7 @@ namespace RestobarSayka.Models.StoredProcedure
         public int Total { get; set; }
 
         public int Propina { get; set; }
+
+        public int TipoPago { get; set; }
     }
 }

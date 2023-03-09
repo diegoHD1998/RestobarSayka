@@ -33,6 +33,11 @@ export default class StoredProcedureVentas {
         return await axios.post(`${baseUrl}/spVentasDelDia`,fecha).then(res => res)
         .catch(err =>  err.response)
     }
+
+    async GetVentasDelDiaTotales(fecha){
+        return await axios.post(`${baseUrl}/spVentasDelDiaTotales`,fecha).then(res => res)
+        .catch(err =>  err.response)
+    }
     
 
 

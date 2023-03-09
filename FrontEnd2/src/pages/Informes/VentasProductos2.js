@@ -14,13 +14,12 @@ const VentasProductos2 = () => {
 
     let fecha =  useMemo(() => {
         let date = new Date()
-        date.setDate(date.getDate()-30)
+        //date.setDate(date.getDate()-30)
         return date
     },[]);
 
     let fecha1 = useMemo(() => {
         let date1 = new Date()
-        console.log(date1)
         return date1
     },[])
 
@@ -54,13 +53,14 @@ const VentasProductos2 = () => {
         console.log(fechas)
         
         const storedProcedureVentas = new StoredProcedureVentas()
-        storedProcedureVentas.GetVentasProducto(fechas).then(res => {
+        storedProcedureVentas.GetVentasProductoSpecific(fechas).then(res => {
             if(res){
                 if(res.status >= 200 && res.status < 300){
                     
                     setVentasProducto(res.data)
+                    console.log(res.data)
 
-                    let top6 = res.data.splice(0, 7)
+                    let top6 = res.data.splice(0,5)
                     setVentasProductosTop6(top6)
                     
                 }else{
@@ -75,10 +75,10 @@ const VentasProductos2 = () => {
     },[fecha, fecha1]);
     
     const basicData = {
-        labels: VentasProductosTop6.map(value => `${value.nombre} (${value.cantidad})`),
+        labels: VentasProductosTop6.map(value => `${value.nombre} ${value.nombreReferencia} $${value.total}`),
         datasets: [{
-            label: "Top #6 Productos mas vendidos",
-            data: VentasProductosTop6.map((value) => value.total),
+            label: "Top #10 Productos mas vendidos",
+            data: VentasProductosTop6.map((value) => value.cantidad),
             fill: true,
             backgroundColor: [
                 'rgba(255, 99, 132, 1)',
@@ -87,6 +87,10 @@ const VentasProductos2 = () => {
                 'rgba(75, 192, 192, 1)',
                 'rgba(153, 102, 255, 1)',
                 'rgba(255, 159, 64, 1)',
+                'rgba(50, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
               ],
               borderColor: [
                 'rgba(255, 99, 132, 1)',
@@ -95,8 +99,13 @@ const VentasProductos2 = () => {
                 'rgba(75, 192, 192, 1)',
                 'rgba(153, 102, 255, 1)',
                 'rgba(255, 159, 64, 1)',
+                'rgba(50, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
               ],
-              borderWidth: 1,      
+              borderWidth: 1,    
+              
         }
         ]
     };
@@ -104,41 +113,26 @@ const VentasProductos2 = () => {
     const options = {
         //maintainAspectRatio:false,
         responsive: true,
-        // indexAxis: "y",
-        // elements: {
-        //     bar: {
-        //         borderWidth: 2,
-        //     },
-        // },
-        // plugins: {
-        //     title: {
-        //         display: true,
-        //         text: "Ventas por Producto",
-        //     },
-        //     legend: {
-        //         display:false
-        //     },
-        //      tooltip:{
-        //         callbacks:{
-        //             label: function(value){
-        //                 let valor = value.raw.toLocaleString("es-CL",{style:"currency", currency:"CLP"})
-        //                 let texto = `${value.dataset.label}: ${valor}`
-        //                 return texto ;
-        //             }
-        //         }
-        //     } 
-        // },
-        // scales:{
-        //     x:{
-        //         ticks: {
-        //             beginAtZero: true,
-        //             // stepSize: 200000, 
-        //             callback: function(value) {
-        //                 return value.toLocaleString("es-CL",{style:"currency", currency:"CLP"});
-        //             },
-        //         }
-        //     }
-        // },
+        //radius:90,
+        plugins: {
+            title: {
+                display: true,
+                text: "Ventas por Producto",
+            },
+            legend: {
+                display:true,
+                position:'left',
+                boxWidth: 60,
+                labels:{
+                    boxWidth:10,
+                    borderRadius:'10px'
+                }
+                
+            },
+             
+        },
+         
+         
         
     };
     
@@ -150,11 +144,16 @@ const VentasProductos2 = () => {
         _rangoFecha[`${name}`] = val;
         setRangoFecha(_rangoFecha)
         
-        await storedProcedureVentas.GetVentasProducto(_rangoFecha).then(res => {
+        await storedProcedureVentas.GetVentasProductoSpecific(_rangoFecha).then(res => {
             if(res){
                 if(res.status >= 200 && res.status < 300){
+
                     setVentasProducto(res.data)
                     
+                    let datos = [...res.data]
+                    let top6 = datos.splice(0,5)
+                    setVentasProductosTop6(top6)
+
                 }else{
                     console.log(res.data)
                     console.log('Error de status No controlado')
@@ -189,13 +188,15 @@ const VentasProductos2 = () => {
 
             </div> 
 
-            <div className='p-grid  ' >
+            <div className='p-grid ' >
 
-                <div className='p-card p-col-12 p-mb-6 ' >
-                    <Pie data={basicData} options={options} height={400}/>
+                <div className=' p-col-12 p-md-6 ' >
+                    <div className='p-col-12 p-md-12 p-card ' >
+                        <Pie data={basicData} options={options} />
+                    </div>
                 </div>
 
-                <div className='p-card p-col-12 ' >
+                <div className='p-col-12 p-md-6 ' >
                     
                     <DataTable value={VentasProducto} header='Detalle Ventas por Producto' responsiveLayout="scroll">
                         <Column field="nombre" header="Nombre"></Column>

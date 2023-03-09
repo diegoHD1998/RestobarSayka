@@ -86,6 +86,25 @@ namespace RestobarSayka.Controllers
             return Ok(result);
         }
 
+        //GET api/Ventas/spVentasDelDiaTotales
+        [HttpPost("spVentasDelDiaTotales")]
+        public async Task<ActionResult<SP_VentasDelDiaTotales>> GetVentasDelDiaTotales(FechaDto fecha)
+        {
+            
+            try
+            {
+                var result = _context.SP_VentasDelDiaTotales.FromSqlInterpolated($"Exec SP_VentasDelDiaTotales @fecha1 = {fecha.Date1} ");
+
+                return Ok(result);
+            }
+            catch( Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            
+            
+        }
+
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         // GET: api/Ventas/5

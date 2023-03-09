@@ -319,11 +319,6 @@ const PedidosMesa = () => {
         selectProducto(value)
     }
 
-    const cambiarSelectTranferirMesa = (value) => {
-        console.log(value)
-        setSelectedTransferenciaMesa(value)
-    }
-
     const selectProducto = (_producto) => {
         console.log(_producto)
         setProducto(_producto);
@@ -497,10 +492,10 @@ const PedidosMesa = () => {
                             console.log(res.data)
                         }else if(res.status >= 400 && res.status<500){
                             console.log(res)
-                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 10000 });
                         }else{
                             console.log(res)
-                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Create de Pedido, Status no controlado`, life: 5000 });
+                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Create de Pedido, Status no controlado`, life: 10000 });
                         }
                     }
                 });
@@ -530,10 +525,10 @@ const PedidosMesa = () => {
 
                         }else if(res.status >= 400 && res.status<500){
                             console.log(res)
-                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 10000 });
                         }else{
                             console.log(res)
-                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Create de ProductoPedido, Status no controlado`, life: 5000 });
+                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Create de ProductoPedido, Status no controlado`, life: 10000 });
                         }
                     }
                 })
@@ -561,10 +556,10 @@ const PedidosMesa = () => {
     
                             }else if(res.status >= 400 && res.status<500){
                                 console.log(res)
-                                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+                                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 10000 });
                             }else{
                                 console.log(res)
-                                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Create de ProductoPedido, Status no controlado`, life: 5000 });
+                                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Create de ProductoPedido, Status no controlado`, life: 10000 });
                             }
                         }
                     })
@@ -593,10 +588,10 @@ const PedidosMesa = () => {
 
                         }else if(res.status >= 400 && res.status<500){
                             console.log(res)
-                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 10000 });
                         }else{
                             console.log(res)
-                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Create de ProductoPedido, Status no controlado`, life: 5000 });
+                            toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Create de ProductoPedido, Status no controlado`, life: 10000 });
                         }
                     }
                 })
@@ -665,11 +660,11 @@ const PedidosMesa = () => {
                     }else{
                         console.log('error en Registrar venta efectivo')
                         console.log(res.data)
-                        toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: 'Error en Registrar Venta con Efectivo', life: 5000 });
+                        toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: 'Error en Registrar Venta con Efectivo', life: 10000 });
                     }
                 })
             }else{
-                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: 'Efectivo Recibido No Suficiente', life: 6000 });
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: 'Efectivo Recibido No Suficiente', life: 10000 });
             }
 
 
@@ -706,7 +701,7 @@ const PedidosMesa = () => {
                     setDialogTarjeta(true)
                 }else{
                     console.log('error en Registrar venta efectivo')
-                    toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: 'Error en Registrar Venta con Tarjeta', life: 5000 });
+                    toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: 'Error en Registrar Venta con Tarjeta', life: 10000 });
                 }
             })
             
@@ -744,10 +739,10 @@ const PedidosMesa = () => {
                     
     
                 }else if(res.status >= 400 && res.status < 500){
-                    toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+                    toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 10000 });
                 }else{
                     console.log(res)
-                    toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Impresora, Status No controlado`, life: 5000 });
+                    toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Impresora, Status No controlado`, life: 10000 });
                 }
             })
         }
@@ -805,10 +800,10 @@ const PedidosMesa = () => {
                 showTopLeft2()
 
             }else if(res.status >= 400 && res.status < 500){
-                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 10000 });
             }else{
                 console.log(res)
-                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Impresora preCuenta, Status No controlado`, life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Impresora preCuenta, Status No controlado`, life: 10000 });
             }
 
         })
@@ -834,10 +829,10 @@ const PedidosMesa = () => {
                 toast.current.show({ severity: 'success', summary: 'Operacion Exitosa', detail: 'Producto Eliminado', life: 5000 });
 
             }else if(res.status >= 400 && res.status < 500){
-                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 10000 });
             }else{
                 console.log(res)
-                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Delete ProductoPedido, Status No controlado`, life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `Error en Delete ProductoPedido, Status No controlado`, life: 10000 });
             }
         });
     }
@@ -917,10 +912,10 @@ const PedidosMesa = () => {
                 setpreTransferenciaMesaDialog(true)
 
             }else if(res.status >= 400 && res.status < 500){
-                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 10000 });
             }else{
                 console.log(res)
-                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `error al buscar mesas, Status No controlado`, life: 5000 });
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `error al buscar mesas, Status No controlado`, life: 10000 });
             }
         })
 
@@ -931,19 +926,33 @@ const PedidosMesa = () => {
         setTransferenciaMesaDialog(true)
     }
 
-    const TransferirMesa = () => {
+    const TransferirMesa = async() => {
+        console.log(selectedTransferenciaMesa)
 
+        let transferencia = {
+            idPedido: pedido.idPedido,
+            idMesa:selectedTransferenciaMesa.idMesa
+        }
 
+        await mesaService.transferirMesa(transferencia).then(res => {
+            console.log(res)
+            if(res.status >= 200 && res.status < 300){
 
+                setTransferenciaMesaDialog(false)
+                setpreTransferenciaMesaDialog(false)
+                setSelectedTransferenciaMesa(null)
+                /* history.push(`/pedido/${res.data.idMesa}/${res.data.nombre}/${res.data.disponibilidad}/${res.data.zonaIdZona}`) */
+                history.push("/")
+                
+            }else if(res.status >= 400 && res.status < 500){
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `${res.data}`, life: 10000 });
+            }else{
+                console.log(res)
+                toast.current.show({ severity: 'error', summary: 'Operacion Fallida', detail: `error Tranferir Mesa, Status No controlado`, life: 10000 });
+            }
 
+        })
 
-
-
-
-
-        setTransferenciaMesaDialog(false)
-        setpreTransferenciaMesaDialog(false)
-        history.push("/")
 
     }
 
@@ -1178,7 +1187,7 @@ const PedidosMesa = () => {
     const TransferirMesaDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" className="p-button-danger" onClick={hideTransferenciaMesa} />
-            <Button label="Si" icon="pi pi-check" className="p-button-success" onClick={TransferirMesa} />
+            <Button label="Si" icon="pi pi-check" className="p-button-success" onClick={() => TransferirMesa()} />
         </>
     );
 
@@ -1512,7 +1521,7 @@ const PedidosMesa = () => {
             <Dialog visible={preTransferenciaMesaDialog} style={{ width: '600px' }} header={`${name}: Seleccione la mesa hacia donde enviar los productos`} modal footer={PreTransferirMesaDialogFooter} onHide={hidePreTransferirMesa} >
                     
                 <DataTable ref={dt} dataKey='idMesa' value={mesas} scrollable scrollHeight='400px'  
-                 selection={selectedTransferenciaMesa} onSelectionChange={e => cambiarSelectTranferirMesa(e.value)} globalFilter={globalFilter}  selectionMode="single" emptyMessage='No hay Mesas Disponibles'>
+                 selection={selectedTransferenciaMesa} onSelectionChange={e => setSelectedTransferenciaMesa(e.value)} globalFilter={globalFilter}  selectionMode="single" emptyMessage='No hay Mesas Disponibles'>
                     <Column field='nombre' /* headerStyle={{display:'none'}} */ header={selectedTransferenciaMesa !== null ? `La Mesa Seleccionada es: ${selectedTransferenciaMesa.nombre}` : ''} body={MesasTemplate} />
                 </DataTable>
 

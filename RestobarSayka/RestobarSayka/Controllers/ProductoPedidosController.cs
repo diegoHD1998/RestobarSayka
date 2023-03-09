@@ -213,7 +213,7 @@ namespace RestobarSayka.Controllers
                                                  IpImpresora = c.IpImpresora
                                              }).FirstOrDefault();
 
-                    impresoras.ImprimirTicketCancelaAsync(productoCancelado);
+                    await impresoras.ImprimirTicketCancelaAsync(productoCancelado);
                 }
 
                 _context.ProductoPedidos.Remove(productoPedido);
